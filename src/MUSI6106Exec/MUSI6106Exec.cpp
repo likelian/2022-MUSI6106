@@ -31,19 +31,18 @@ int main(int argc, char* argv[])
     CAudioFileIf::FileSpec_t stFileSpec;
     
 
-
     showClInfo();
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
     
     sOutputFilePath = "/Users/likelian/Desktop/Audio_software/Output/filename.txt";
-    //sInputFilePath = "";
+    sInputFilePath = "/Users/likelian/Desktop/Audio_software/Input/sweep.wav";
  
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
-
-    //phAudioFile->openFile(sInputFilePath, FileIoType_t);
+    phAudioFile->create(CAudioFileIf*& pCInstance); //only return error,
+    phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
  
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -58,6 +57,11 @@ int main(int argc, char* argv[])
     
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
+    
+    long long int iNumFrames;
+    Error_t data = phAudioFile->readData(ppfAudioData, iNumFrames);
+    
+    
     for (int i=0; i<=kBlockSize; i++){
         buffer_ptr[i] = (float)i;
     }
