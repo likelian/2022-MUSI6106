@@ -28,6 +28,8 @@ int main(int argc, char* argv[])
     CAudioFileIf            *phAudioFile = 0;
     std::fstream            hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
+    
+
 
     showClInfo();
 
@@ -36,15 +38,20 @@ int main(int argc, char* argv[])
  
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
+
+    //phAudioFile->openFile(sInputFilePath, FileIoType_t);
  
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
  
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
- 
+    float buffer[kBlockSize];
+
+    
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
+    
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
