@@ -1,6 +1,7 @@
 
 #include <iostream>
 #include <ctime>
+#include <fstream>
 
 #include "MUSI6106Config.h"
 
@@ -35,6 +36,9 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
+    
+    sOutputFilePath = "/Users/likelian/Desktop/Audio_software/Output/filename.txt";
+    //sInputFilePath = "";
  
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
@@ -43,18 +47,32 @@ int main(int argc, char* argv[])
  
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
- 
+    std::ofstream textFile(sOutputFilePath);
+
+    
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
-    float buffer[kBlockSize];
+    float* buffer_ptr;
+    buffer_ptr = new float[kBlockSize];
 
     
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
+    for (int i=0; i<=kBlockSize; i++){
+        buffer_ptr[i] = (float)i;
+    }
     
+    for (int i=0; i<=kBlockSize; i++){
+        textFile << buffer_ptr[i] << '\n';
+    }
+
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
+    
+    //phAudioFile->closeFile();
+    delete[] buffer_ptr;
+    textFile.close();
 
     // all done
     return 0;
