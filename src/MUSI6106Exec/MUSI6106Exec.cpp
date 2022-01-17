@@ -36,7 +36,9 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
     
-    sOutputFilePath = "/Users/likelian/Desktop/Audio_software/Output/filename.txt";
+    //Need to change
+    sOutputFilePath = "/Users/likelian/Desktop/Audio_software/Output/output.txt";
+    //Need to change
     sInputFilePath = "/Users/likelian/Desktop/Audio_software/Input/sweep.wav";
  
     //////////////////////////////////////////////////////////////////////////////
@@ -57,16 +59,14 @@ int main(int argc, char* argv[])
     float fBuffer_L[kBlockSize];
     float fBuffer_R[kBlockSize];
 
-    
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
     
-    
     long long iLengthInFrames;
     pCInstance->getLength(iLengthInFrames);
-    //long long int iNumFrames = iLengthInFrames;
     
-    
+    //Need to change
+    //What is readData doing with iNumFrames?????
     long long iNumFrames = 20;
 
     // allocate ppfAudioData
@@ -78,35 +78,25 @@ int main(int argc, char* argv[])
     
     long long iFrame = 0;
     
-    cout << iLengthInFrames;
-    
-    while(iFrame<iLengthInFrames-iFrame){
-        
-        cout << iFrame << endl;
-        
+    while(iFrame < iLengthInFrames){
+
+        //update frame
         pCInstance->setPosition(iFrame);
         
-        cout << iFrame << endl;
-        
+        //read data
         for (int i=0; i<kBlockSize; i++){
                   pCInstance->readData(ppfAudioData, iNumFrames);
                   fBuffer_L[i] = *ppfAudioData[0];
                   fBuffer_R[i] = *ppfAudioData[1];
-                  
               }
               
+        //wite to txt
         for (int i=0; i<kBlockSize; i++){
                   textFile << fBuffer_L[i] << ' ' << fBuffer_R[i] << '\n';
         }
         
         pCInstance->getPosition(iFrame);
-        
-        cout << iFrame << endl;
-        
     }
-    
-   
-
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
