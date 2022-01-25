@@ -7,6 +7,9 @@
 
 #include "AudioFileIf.h"
 
+/* code revised based on https://github.com/alexanderlerch/2022-MUSI6106/blob/exercise_fileread/src/MUSI6106Exec/MUSI6106Exec.cpp
+*/
+
 using std::cout;
 using std::endl;
 
@@ -47,61 +50,69 @@ int main(int argc, char* argv[])
     phAudioFile->create(pCInstance); //only return error
     pCInstance->openFile(sInputFilePath, CAudioFileIf::kFileRead);
     
+    if (!pCInstance->isOpen())
+    {
+        cout << "Wave file open error!";
+        phAudioFile->destroy(pCInstance);
+        return -1;
+    }
+    
+    pCInstance->getFileSpec(stFileSpec);
  
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
     std::ofstream textFile;
     textFile.open(sOutputFilePath, std::ofstream::out | std::ofstream::app);
+    
+    if (!textFile.is_open())
+    {
+        cout << "Text file open error!";
+        phAudioFile->destroy(pCInstance);
+        return -1;
+    }
 
     
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
-    float fBuffer_L[kBlockSize];
-    float fBuffer_R[kBlockSize];
+    
+    ppfAudioData = new float*[stFileSpec.iNumChannels];
+    for (int i = 0; i < stFileSpec.iNumChannels; i++){
+        ppfAudioData[i] = new float[kBlockSize];
+    }
+    
 
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
     
-    long long iLengthInFrames;
-    pCInstance->getLength(iLengthInFrames);
-    
-    //Need to change
-    //What is readData doing with iNumFrames?????
-    long long iNumFrames = 20;
+    while (!pCInstance->isEof())
+    {
+        // set block length variable
+        long long iNumFrames = kBlockSize;
 
-    // allocate ppfAudioData
-    int row = 2,col = iNumFrames;
-    ppfAudioData = (float **) malloc(row*sizeof(float *));
-    for(int i=0;i<iNumFrames;i++)
-        ppfAudioData[i] = (float *) malloc(col*sizeof(int));
-    
-    
-    long long iFrame = 0;
-    
-    while(iFrame < iLengthInFrames){
+        // read data (iNumOfFrames might be updated!)
+        pCInstance->readData(ppfAudioData, iNumFrames);
 
-        //update frame
-        pCInstance->setPosition(iFrame);
-        
-        //read data
-        for (int i=0; i<kBlockSize; i++){
-                  pCInstance->readData(ppfAudioData, iNumFrames);
-                  fBuffer_L[i] = *ppfAudioData[0];
-                  fBuffer_R[i] = *ppfAudioData[1];
-              }
-              
-        //wite to txt
-        for (int i=0; i<kBlockSize; i++){
-                  textFile << fBuffer_L[i] << ' ' << fBuffer_R[i] << '\n';
+        cout << "\r" << "reading and writing";
+
+        // write
+        for (int i = 0; i < iNumFrames; i++)
+        {
+            for (int c = 0; c < stFileSpec.iNumChannels; c++)
+            {
+                textFile << ppfAudioData[c][i] << "\t";
+            }
+            textFile << endl;
         }
-        
-        pCInstance->getPosition(iFrame);
     }
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
+    for (int i = 0; i < stFileSpec.iNumChannels; i++){
+        delete[] ppfAudioData[i];
+    }
+    delete[] ppfAudioData;
+    
     textFile.close();
-    pCInstance->reset();
     pCInstance->closeFile();
     phAudioFile->destroy(pCInstance);
 
