@@ -16,7 +16,9 @@ void    showClInfo ();
 // main function
 int main(int argc, char* argv[])
 {
-    CRingBuffer<float>* pCRingBuff = 0; 
+
+    
+    CRingBuffer<float>* pCRingBuff = 0;
     
     static const int kBlockSize = 17;
 
@@ -28,13 +30,16 @@ int main(int argc, char* argv[])
     {
         pCRingBuff->putPostInc(1.F*i);
     }
-
+    
+    
     for (int i = 5; i < 30; i++)
     {
-        pCRingBuff->getNumValuesInBuffer(); // should be five
-        pCRingBuff->getPostInc(); // should be i-5
+        int a = pCRingBuff->getNumValuesInBuffer(); // should be five
+        float b = pCRingBuff->getPostInc(); // should be i-5
         pCRingBuff->putPostInc(1.F*i);
     }
+    
+    pCRingBuff->~CRingBuffer();
 
     // all done
     return 0;
