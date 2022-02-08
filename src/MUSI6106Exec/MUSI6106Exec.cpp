@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
 
     showClInfo();
     
-    // test github
+    // test github some change
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
