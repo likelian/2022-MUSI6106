@@ -31,6 +31,8 @@ int main(int argc, char* argv[])
     CAudioFileIf::FileSpec_t stFileSpec;
 
     showClInfo();
+    
+    // test github
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
