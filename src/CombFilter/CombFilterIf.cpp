@@ -88,6 +88,8 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
         return Error_t::kUnknownError;
     }
     
+    m_iNumberOfChannels = iNumChannels;
+    
     static const int kBlockSize = (int)(fMaxDelayLengthInS * fSampleRateInHz);
     
     CRingBuffer<float> *pCRingBuff[iNumChannels];
@@ -102,8 +104,6 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
 
 Error_t CCombFilterIf::reset ()
 {
-    
-    
     //resets the internal variables (requires new call of init)
     
     return Error_t::kNoError;
@@ -111,6 +111,15 @@ Error_t CCombFilterIf::reset ()
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
+    
+    for (int i = 0; i < iNumberOfFrames; i++){
+        for (int c = 0; c < m_iNumberOfChannels; c++)
+        {
+            float a = ppfInputBuffer[c][i];
+            ppfOutputBuffer[c][i] = a;
+        }
+        
+    }
     
     return Error_t::kNoError;
 }

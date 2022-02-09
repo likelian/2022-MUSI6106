@@ -25,6 +25,7 @@ int main(int argc, char* argv[])
     clock_t time = 0;
 
     float **ppfAudioData = 0;
+    float **ppfOutputBuffer = 0;
 
     CAudioFileIf *phAudioFile = 0;
     std::fstream hOutputFile;
@@ -55,8 +56,6 @@ int main(int argc, char* argv[])
     
     
     
-    CCombFilterIf::destroy(pCCombFilterIf);
-    
     
     
     CAudioFileIf::create(phAudioFile);
@@ -82,6 +81,7 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
     ppfAudioData = new float*[stFileSpec.iNumChannels];
+    ppfOutputBuffer = new float*[stFileSpec.iNumChannels];
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
         ppfAudioData[i] = new float[kBlockSize];
 
@@ -109,6 +109,9 @@ int main(int argc, char* argv[])
 
         // read data (iNumOfFrames might be updated!)
         phAudioFile->readData(ppfAudioData, iNumFrames);
+        
+        pCCombFilterIf->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
+        
 
         cout << "\r" << "reading and writing";
 
@@ -127,6 +130,7 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
+    CCombFilterIf::destroy(pCCombFilterIf);
     CAudioFileIf::destroy(phAudioFile);
     hOutputFile.close();
 
