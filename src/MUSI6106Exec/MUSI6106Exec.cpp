@@ -32,7 +32,6 @@ int main(int argc, char* argv[])
 
     showClInfo();
     
-    // test github some change
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
@@ -49,6 +48,12 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
+    
+    CCombFilterIf *pCCombFilterIf = 0;
+    CCombFilterIf::create(pCCombFilterIf);
+    
+    
+    
     CAudioFileIf::create(phAudioFile);
     phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
     if (!phAudioFile->isOpen())

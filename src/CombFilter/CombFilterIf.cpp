@@ -56,6 +56,11 @@ const char*  CCombFilterIf::getBuildDate ()
 
 Error_t CCombFilterIf::create (CCombFilterIf*& pCCombFilter)
 {
+    if (!pCCombFilter)
+            return Error_t::kMemError;
+    
+    
+    
     return Error_t::kNoError;
 }
 
