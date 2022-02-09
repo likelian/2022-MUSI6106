@@ -51,6 +51,11 @@ int main(int argc, char* argv[])
     
     CCombFilterIf *pCCombFilterIf = 0;
     CCombFilterIf::create(pCCombFilterIf);
+    pCCombFilterIf->init(CCombFilterIf::kCombFIR, 0.1, 44100, 2);
+    
+    
+    
+    CCombFilterIf::destroy(pCCombFilterIf);
     
     
     

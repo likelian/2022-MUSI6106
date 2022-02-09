@@ -8,24 +8,25 @@
 #ifndef CombFilter_h
 #define CombFilter_h
 #include <CombFilterIf.h>
+#include <RingBuffer.h>
 
-//template <class T>
 
 
-class CCombFilterBase: public::CCombFilterIf
+
+
+class CCombFilterBase: public CCombFilterIf
 {
 public:
-    
-protected:
-    
-private:
-    
+    //CCombFilterBase ();
+    //~CCombFilterBase ();
 };
 
 
-class CIIRCombFilter: public::CCombFilterBase
+class CCombFIR: public CCombFilterBase
 {
 public:
+    //CIIRCombFilter ();
+    //~CIIRCombFilter ();
         
 protected:
         
@@ -34,7 +35,7 @@ private:
 
 };
 
-class CFIRCombFilter: public::CCombFilterBase
+class CCombIIR: public::CCombFilterBase
 {
 public:
             

@@ -2,9 +2,9 @@
 #define __CombFilterIf_hdr__
 
 #include "ErrorDef.h"
+//#include "CombFilter.h"
 
 class CCombFilterBase; // in case you intend to add an internal base class that the user doesn't see (not required)
-
 
 
 /*! \brief interface class for the comb filter (FIR & IIR)
@@ -107,6 +107,8 @@ private:
     CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
 
     float           m_fSampleRate;      //!< audio sample rate in Hz
+    
+
 };
 
 #endif // #if !defined(__CombFilterIf_hdr__)

@@ -6,8 +6,11 @@
 
 #include "ErrorDef.h"
 #include "Util.h"
-
 #include "CombFilterIf.h"
+#include "RingBuffer.h"
+#include "CombFilter.cpp"
+#include <list>
+
 
 static const char*  kCMyProjectBuildDate = __DATE__;
 
@@ -56,31 +59,59 @@ const char*  CCombFilterIf::getBuildDate ()
 
 Error_t CCombFilterIf::create (CCombFilterIf*& pCCombFilter)
 {
+    
+    pCCombFilter = new CCombFilterBase ();
+    
     if (!pCCombFilter)
-            return Error_t::kMemError;
-    
-    
-    
+        return Error_t::kMemError;
+  
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 {
+    delete pCCombFilter;
+    pCCombFilter  = 0;
+    
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
+
+    if (eFilterType == kCombFIR){
+        m_pCCombFilter = new CCombFIR ();
+    }
+    else if (eFilterType == kCombIIR){
+        m_pCCombFilter = new CCombIIR ();
+    }else{
+        return Error_t::kUnknownError;
+    }
+    
+    static const int kBlockSize = (int)(fMaxDelayLengthInS * fSampleRateInHz);
+    
+    CRingBuffer<float> *pCRingBuff[iNumChannels];
+
+    for(int i = 0; i < iNumChannels; i++){
+        pCRingBuff[i] = new CRingBuffer<float>(kBlockSize);
+    }
+    
+    
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::reset ()
 {
+    
+    
+    //resets the internal variables (requires new call of init)
+    
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
+    
     return Error_t::kNoError;
 }
 
