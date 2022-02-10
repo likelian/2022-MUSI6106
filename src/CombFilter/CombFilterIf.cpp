@@ -12,6 +12,7 @@
 #include <list>
 
 
+
 static const char*  kCMyProjectBuildDate = __DATE__;
 
 
@@ -59,19 +60,13 @@ const char*  CCombFilterIf::getBuildDate ()
 
 Error_t CCombFilterIf::create (CCombFilterIf*& pCCombFilter)
 {
-    
-    pCCombFilter = new CCombFilterBase ();
-    
-    if (!pCCombFilter)
-        return Error_t::kMemError;
-  
+    //call base
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 {
-    delete pCCombFilter;
-    pCCombFilter  = 0;
+    //call base
     
     return Error_t::kNoError;
 }
@@ -79,26 +74,7 @@ Error_t CCombFilterIf::destroy (CCombFilterIf*& pCCombFilter)
 Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
 
-    if (eFilterType == kCombFIR){
-        m_pCCombFilter = new CCombFIR ();
-    }
-    else if (eFilterType == kCombIIR){
-        m_pCCombFilter = new CCombIIR ();
-    }else{
-        return Error_t::kUnknownError;
-    }
-    
-    m_iNumberOfChannels = iNumChannels;
-    
-    static const int kBlockSize = (int)(fMaxDelayLengthInS * fSampleRateInHz);
-    
-    CRingBuffer<float> *pCRingBuff[iNumChannels];
-
-    for(int i = 0; i < iNumChannels; i++){
-        pCRingBuff[i] = new CRingBuffer<float>(kBlockSize);
-    }
-    
-    
+    //call base
     return Error_t::kNoError;
 }
 
@@ -112,14 +88,7 @@ Error_t CCombFilterIf::reset ()
 Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
     
-    for (int i = 0; i < iNumberOfFrames; i++){
-        for (int c = 0; c < m_iNumberOfChannels; c++)
-        {
-            float a = ppfInputBuffer[c][i];
-            ppfOutputBuffer[c][i] = a;
-        }
-        
-    }
+    //call base
     
     return Error_t::kNoError;
 }
