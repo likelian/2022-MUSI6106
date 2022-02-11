@@ -68,13 +68,13 @@ public:
     \param fParamValue value of the parameter
     \return Error_t
     */
-    Error_t setParam (FilterParam_t eParam, float fParamValue);
+    Error_t setParam (int iParam, float fParamValue);
     
     /*! return the value of the specified parameter
     \param eParam
     \return float
     */
-    float   getParam (FilterParam_t eParam) const;
+    float   getParam (int iParam) const;
     
     /*! processes one block of audio
     \param ppfInputBuffer input buffer [numChannels][iNumberOfFrames]
@@ -95,6 +95,9 @@ private:
 
     float           m_fSampleRate;      //!< audio sample rate in Hz
     int             m_iNumberOfChannels;//!< number of chaneels in int
+    
+    float           m_ParamGain;         //!< gain as factor (usually -1...1)
+    float           M_ParamDelay;        //!< delay in seconds for specification of comb width
     
 };
 

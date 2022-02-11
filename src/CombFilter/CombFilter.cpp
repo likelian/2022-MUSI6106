@@ -17,7 +17,6 @@
 
 
 
-
 CCombFilterBase::CCombFilterBase () :
     m_bIsInitialized(false),
     //m_pCCombFilter(0),
@@ -81,6 +80,7 @@ Error_t CCombFilterBase::process (float **ppfInputBuffer, float **ppfOutputBuffe
         {
             float a = ppfInputBuffer[c][i];
             ppfOutputBuffer[c][i] = a;
+            
         }
         
     }
@@ -88,12 +88,40 @@ Error_t CCombFilterBase::process (float **ppfInputBuffer, float **ppfOutputBuffe
     return Error_t::kNoError;
 }
 
-Error_t CCombFilterBase::setParam (FilterParam_t eParam, float fParamValue)
+Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
 {
+    FilterParam_t eParam = (FilterParam_t)iParam;
+        
+    switch(eParam){
+        case FilterParam_t::kParamGain:
+            if (fParamValue<-1. || fParamValue>1.){
+                return Error_t::kFunctionInvalidArgsError;
+            }
+            m_ParamGain = fParamValue;
+            
+        case FilterParam_t::kParamDelay:
+            M_ParamDelay = fParamValue;
+            
+        case kNumFilterParams:kNumFilterParams:
+            break;
+    }
+    
     return Error_t::kNoError;
 }
 
-float CCombFilterBase::getParam (FilterParam_t eParam) const
+float CCombFilterBase::getParam (int iParam) const
 {
-    return 0;
+    FilterParam_t eParam = (FilterParam_t)iParam;
+        
+    switch(eParam){
+        case FilterParam_t::kParamGain:
+            return m_ParamGain;
+            
+        case FilterParam_t::kParamDelay:
+            return M_ParamDelay;
+            
+        case kNumFilterParams:kNumFilterParams:
+            break;
+    }
+    
 }

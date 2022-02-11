@@ -120,16 +120,25 @@ Error_t CCombFilterIf::process (float **ppfInputBuffer, float **ppfOutputBuffer,
         return Error_t::kNotInitializedError;
     };
     
+    if (!ppfInputBuffer || !ppfOutputBuffer[0] || iNumberOfFrames < 0)
+        return Error_t::kFunctionInvalidArgsError;
+    
+    
+    m_pCCombFilter->process(ppfInputBuffer, ppfOutputBuffer, iNumberOfFrames);
+    
     
     return Error_t::kNoError;
 }
 
 Error_t CCombFilterIf::setParam (FilterParam_t eParam, float fParamValue)
 {
+    
+    m_pCCombFilter->setParam(static_cast<FilterParam_t>(eParam), fParamValue);
+    
     return Error_t::kNoError;
 }
 
 float CCombFilterIf::getParam (FilterParam_t eParam) const
 {
-    return 0;
+    return m_pCCombFilter->getParam(static_cast<FilterParam_t>(eParam));
 }

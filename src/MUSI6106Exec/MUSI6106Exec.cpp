@@ -82,8 +82,10 @@ int main(int argc, char* argv[])
     // allocate memory
     ppfAudioData = new float*[stFileSpec.iNumChannels];
     ppfOutputBuffer = new float*[stFileSpec.iNumChannels];
-    for (int i = 0; i < stFileSpec.iNumChannels; i++)
+    for (int i = 0; i < stFileSpec.iNumChannels; i++){
         ppfAudioData[i] = new float[kBlockSize];
+        ppfOutputBuffer[i] = new float[kBlockSize];
+    }
 
     if (ppfAudioData == 0)
     {
@@ -97,6 +99,13 @@ int main(int argc, char* argv[])
         hOutputFile.close();
         return -1;
     }
+    
+    
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, 0.1);
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, 1.1);
+    
+    float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+    float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
 
     time = clock();
 
@@ -109,6 +118,7 @@ int main(int argc, char* argv[])
 
         // read data (iNumOfFrames might be updated!)
         phAudioFile->readData(ppfAudioData, iNumFrames);
+        
         
         pCCombFilter->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
         
