@@ -8,3 +8,21 @@
 #include "FIRComb.h"
 
 
+Error_t CFIRComb::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
+{
+    
+    for (int i = 0; i < iNumberOfFrames; i++){
+        for (int c = 0; c < m_iNumberOfChannels; c++)
+        {
+
+            ppfOutputBuffer[c][i] = ppfInputBuffer[c][i] + m_ParamGain * pCRingBuff[c]->getPostInc();
+            
+            pCRingBuff[c]->putPostInc(ppfInputBuffer[c][i]);
+            
+            
+        }
+        
+    }
+    
+    return Error_t::kNoError;
+}

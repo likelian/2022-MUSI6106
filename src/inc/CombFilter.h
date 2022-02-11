@@ -82,14 +82,12 @@ public:
     \param iNumberOfFrames buffer length (per channel)
     \return Error_t
     */
-    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames);
+    virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames);
 
     CCombFilterBase ();
     virtual ~CCombFilterBase ();
     
 protected:
-
-private:
     bool            m_bIsInitialized;   //!< internal bool to check whether the init function has been called
     //CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
 
@@ -97,9 +95,13 @@ private:
     int             m_iNumberOfChannels;//!< number of chaneels in int
     
     float           m_ParamGain;         //!< gain as factor (usually -1...1)
-    float           M_ParamDelay;        //!< delay in seconds for specification of comb width
+    float           m_ParamDelay;        //!< delay in seconds for specification of comb width
+    
+    float           m_fMaxDelayLengthInS; //!< maximum delay in seconds
     
     CRingBuffer<float> **pCRingBuff;
+    
+private:
     
 };
 

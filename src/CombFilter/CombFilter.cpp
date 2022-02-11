@@ -24,7 +24,7 @@ CCombFilterBase::CCombFilterBase () :
     m_fSampleRate(0),
     m_iNumberOfChannels(0),
     m_ParamGain(0),
-    M_ParamDelay(0)
+    m_ParamDelay(0)
 {
     // this should never hurt
     this->reset ();
@@ -58,6 +58,8 @@ Error_t CCombFilterBase::init (float fMaxDelayLengthInS, float fSampleRateInHz, 
 
     m_iNumberOfChannels = iNumChannels;
     
+    m_fMaxDelayLengthInS = fMaxDelayLengthInS;
+    
     static const int kBlockSize = (int)(fMaxDelayLengthInS * m_fSampleRate);
     
     pCRingBuff = new CRingBuffer<float> *[iNumChannels];
@@ -83,7 +85,7 @@ Error_t CCombFilterBase::reset ()
     m_fSampleRate = 0;
     m_iNumberOfChannels = 0;
     m_ParamGain = 0.;
-    M_ParamDelay = 0.;
+    m_ParamDelay = 0.;
     
     m_bIsInitialized = false;
     
@@ -120,10 +122,10 @@ Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
             m_ParamGain = fParamValue;
             
         case FilterParam_t::kParamDelay:
-            if (fParamValue < 0.){
+            if (fParamValue < 0. || fParamValue >= m_fMaxDelayLengthInS){
                 return Error_t::kFunctionInvalidArgsError;
             }
-            M_ParamDelay = fParamValue;
+            m_ParamDelay = fParamValue;
             
         case kNumFilterParams:kNumFilterParams:
             break;
@@ -141,7 +143,7 @@ float CCombFilterBase::getParam (int iParam) const
             return m_ParamGain;
             
         case FilterParam_t::kParamDelay:
-            return M_ParamDelay;
+            return m_ParamDelay;
             
         case kNumFilterParams:kNumFilterParams:
             break;

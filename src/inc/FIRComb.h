@@ -17,6 +17,7 @@
 class CFIRComb: public::CCombFilterBase
 {
 public:
+    Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames) override;
             
 protected:
             
