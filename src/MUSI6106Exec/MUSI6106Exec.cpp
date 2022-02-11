@@ -18,7 +18,8 @@ void    showClInfo ();
 int main(int argc, char* argv[])
 {
     std::string sInputFilePath,                 //!< file paths
-                sOutputFilePath;
+                sOutputFilePath,
+                audioOuputFilePath;
 
     static const int kBlockSize = 1024;
 
@@ -28,6 +29,7 @@ int main(int argc, char* argv[])
     float **ppfOutputBuffer = 0;
 
     CAudioFileIf *phAudioFile = 0;
+    CAudioFileIf *phAudioWriteFile = 0;
     std::fstream hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
 
@@ -45,16 +47,11 @@ int main(int argc, char* argv[])
     {
         sInputFilePath = argv[1];
         sOutputFilePath = sInputFilePath + ".txt";
+        audioOuputFilePath = argv[2];
     }
 
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
-    
-    
-    
-    
-    
-    
     
     CAudioFileIf::create(phAudioFile);
     phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
@@ -66,6 +63,16 @@ int main(int argc, char* argv[])
     }
     phAudioFile->getFileSpec(stFileSpec);
     
+
+    CAudioFileIf::create(phAudioWriteFile);
+    phAudioWriteFile->openFile(audioOuputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
+    if (!phAudioWriteFile->isOpen())
+    {
+        cout << "Wave file open error!";
+        CAudioFileIf::destroy(phAudioWriteFile);
+        return -1;
+    }
+
     
     
     ///////////////////Comb
@@ -103,11 +110,7 @@ int main(int argc, char* argv[])
     cout << "delay_two: " << delay << endl;
     
     
-    
-    
-    
     ///////////////////Comb
-    
     
 
     //////////////////////////////////////////////////////////////////////////////
@@ -128,6 +131,7 @@ int main(int argc, char* argv[])
         ppfAudioData[i] = new float[kBlockSize];
         ppfOutputBuffer[i] = new float[kBlockSize];
     }
+    
 
     if (ppfAudioData == 0)
     {
@@ -159,6 +163,8 @@ int main(int argc, char* argv[])
         
 
         cout << "\r" << "reading and writing";
+        
+        phAudioWriteFile->writeData(ppfOutputBuffer, iNumFrames);
 
         // write
         for (int i = 0; i < iNumFrames; i++)
@@ -177,12 +183,19 @@ int main(int argc, char* argv[])
     // clean-up (close files and free memory)
     CCombFilterIf::destroy(pCCombFilter);
     CAudioFileIf::destroy(phAudioFile);
+    CAudioFileIf::destroy(phAudioWriteFile);
+    
     hOutputFile.close();
 
-    for (int i = 0; i < stFileSpec.iNumChannels; i++)
+    for (int i = 0; i < stFileSpec.iNumChannels; i++){
         delete[] ppfAudioData[i];
+        delete[] ppfOutputBuffer[i];
+    }
     delete[] ppfAudioData;
+    delete[] ppfOutputBuffer;
+    
     ppfAudioData = 0;
+    ppfOutputBuffer = 0;
 
     // all done
     return 0;
