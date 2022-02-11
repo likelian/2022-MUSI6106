@@ -99,13 +99,16 @@ int main(int argc, char* argv[])
         hOutputFile.close();
         return -1;
     }
+
     
-    
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, 0.1);
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, 1.1);
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
     
     float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
     float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+    
+    cout << "gain: " << gain << endl;
+    cout << "delay: " << delay << endl;
 
     time = clock();
 

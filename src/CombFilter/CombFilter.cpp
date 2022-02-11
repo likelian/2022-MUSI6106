@@ -94,12 +94,15 @@ Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
         
     switch(eParam){
         case FilterParam_t::kParamGain:
-            if (fParamValue<-1. || fParamValue>1.){
+            if (fParamValue < -1. || fParamValue > 1.){
                 return Error_t::kFunctionInvalidArgsError;
             }
             m_ParamGain = fParamValue;
             
         case FilterParam_t::kParamDelay:
+            if (fParamValue < 0.){
+                return Error_t::kFunctionInvalidArgsError;
+            }
             M_ParamDelay = fParamValue;
             
         case kNumFilterParams:kNumFilterParams:
