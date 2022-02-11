@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
     
-    CCombFilterIf *pCCombFilterIf = 0;
-    CCombFilterIf::create(pCCombFilterIf);
-    pCCombFilterIf->init(CCombFilterIf::kCombFIR, 0.1, 44100, 2);
+    CCombFilterIf *pCCombFilter = 0;
+    CCombFilterIf::create(pCCombFilter);
+    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.1, 44100, 2);
     
     
     
@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
         // read data (iNumOfFrames might be updated!)
         phAudioFile->readData(ppfAudioData, iNumFrames);
         
-        pCCombFilterIf->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
+        pCCombFilter->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
         
 
         cout << "\r" << "reading and writing";
@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
-    CCombFilterIf::destroy(pCCombFilterIf);
+    CCombFilterIf::destroy(pCCombFilter);
     CAudioFileIf::destroy(phAudioFile);
     hOutputFile.close();
 

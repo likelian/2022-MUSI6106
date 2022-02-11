@@ -20,7 +20,7 @@
 
 CCombFilterBase::CCombFilterBase () :
     m_bIsInitialized(false),
-    m_pCCombFilter(0),
+    //m_pCCombFilter(0),
     m_fSampleRate(0)
 {
     // this should never hurt
@@ -34,21 +34,24 @@ CCombFilterBase::~CCombFilterBase ()
 }
 
 
+Error_t CCombFilterBase::create(CCombFilterBase *&pCCombFilter)
+{
+    
+    return Error_t::kNoError;
+}
 
 
+Error_t CCombFilterBase::destroy(CCombFilterBase *&pCCombFilter)
+{
+    
+    return Error_t::kNoError;
+}
 
-Error_t CCombFilterBase::init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
+
+Error_t CCombFilterBase::init (float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
 
-    if (eFilterType == kCombFIR){
-        m_pCCombFilter = new CFIRComb ();
-    }
-    else if (eFilterType == kCombIIR){
-        m_pCCombFilter = new CIIRComb ();
-    }else{
-        return Error_t::kUnknownError;
-    }
-    
+
     m_iNumberOfChannels = iNumChannels;
     
     static const int kBlockSize = (int)(fMaxDelayLengthInS * fSampleRateInHz);

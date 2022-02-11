@@ -18,7 +18,6 @@ class CCombFilterBase
 {
 public:
 
-
     /*! feedforward or recursive comb filter */
     enum CombFilterType_t
     {
@@ -42,13 +41,13 @@ public:
     \param pCCombFilter  pointer to the new class
     \return Error_t
     */
-    static Error_t create (CCombFilterBase*& pCCombFilter);
+    Error_t create (CCombFilterBase*& pCCombFilter);
     
     /*! destroys a comb filter instance
     \param pCCombFilter pointer to the class to be destroyed
     \return Error_t
     */
-    static Error_t destroy (CCombFilterBase*& pCCombFilter);
+    Error_t destroy (CCombFilterBase*& pCCombFilter);
     
     /*! initializes a comb filter instance
     \param eFilterType FIR or IIR
@@ -57,7 +56,7 @@ public:
     \param iNumChannels number of audio channels
     \return Error_t
     */
-    Error_t init (CombFilterType_t eFilterType, float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels);
+    Error_t init (float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels);
     
     /*! resets the internal variables (requires new call of init)
     \return Error_t
@@ -85,13 +84,14 @@ public:
     */
     Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames);
 
-protected:
     CCombFilterBase ();
     virtual ~CCombFilterBase ();
+    
+protected:
 
 private:
     bool            m_bIsInitialized;   //!< internal bool to check whether the init function has been called
-    CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
+    //CCombFilterBase *m_pCCombFilter;    //!< handle of the comb filter
 
     float           m_fSampleRate;      //!< audio sample rate in Hz
     int             m_iNumberOfChannels;//!< number of chaneels in int
