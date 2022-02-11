@@ -50,9 +50,7 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
     
-    CCombFilterIf *pCCombFilter = 0;
-    CCombFilterIf::create(pCCombFilter);
-    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.1, 44100, 2);
+    
     
     
     
@@ -67,6 +65,50 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
+    
+    
+    
+    ///////////////////Comb
+    
+    CCombFilterIf *pCCombFilter = 0;
+    CCombFilterIf::create(pCCombFilter);
+    
+    
+    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.1, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
+    
+    
+    float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+    float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+    
+    cout << "gain: " << gain << endl;
+    cout << "delay: " << delay << endl;
+    
+    
+    
+    pCCombFilter->reset();
+    
+    pCCombFilter->init(CCombFilterIf::kCombIIR, 0.2, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, 0.9);
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, 2.);
+    
+    
+    float gain_two = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+    float delay_two = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+    
+    cout << "gain_two: " << gain << endl;
+    cout << "delay_two: " << delay << endl;
+    
+    
+    
+    
+    
+    ///////////////////Comb
+    
+    
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -99,16 +141,6 @@ int main(int argc, char* argv[])
         hOutputFile.close();
         return -1;
     }
-
-    
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
-    
-    float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
-    float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
-    
-    cout << "gain: " << gain << endl;
-    cout << "delay: " << delay << endl;
 
     time = clock();
 

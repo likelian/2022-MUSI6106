@@ -4,6 +4,7 @@
 //
 //  Created by 李克镰 on 2/8/22.
 //
+#include <iostream>
 #include <string>
 #include <fstream>
 #include <algorithm>
@@ -20,7 +21,10 @@
 CCombFilterBase::CCombFilterBase () :
     m_bIsInitialized(false),
     //m_pCCombFilter(0),
-    m_fSampleRate(0)
+    m_fSampleRate(0),
+    m_iNumberOfChannels(0),
+    m_ParamGain(0),
+    M_ParamDelay(0)
 {
     // this should never hurt
     this->reset ();
@@ -50,17 +54,19 @@ Error_t CCombFilterBase::destroy(CCombFilterBase *&pCCombFilter)
 Error_t CCombFilterBase::init (float fMaxDelayLengthInS, float fSampleRateInHz, int iNumChannels)
 {
 
+    m_fSampleRate = fSampleRateInHz;
 
     m_iNumberOfChannels = iNumChannels;
     
-    static const int kBlockSize = (int)(fMaxDelayLengthInS * fSampleRateInHz);
+    static const int kBlockSize = (int)(fMaxDelayLengthInS * m_fSampleRate);
     
-    CRingBuffer<float> *pCRingBuff[iNumChannels];
-
-    for(int i = 0; i < iNumChannels; i++){
+    pCRingBuff = new CRingBuffer<float> *[iNumChannels];
+    for (int i = 0; i < iNumChannels; i++){
         pCRingBuff[i] = new CRingBuffer<float>(kBlockSize);
     }
     
+    
+    m_bIsInitialized = true;
     
     return Error_t::kNoError;
 }
@@ -68,6 +74,19 @@ Error_t CCombFilterBase::init (float fMaxDelayLengthInS, float fSampleRateInHz, 
 Error_t CCombFilterBase::reset ()
 {
     //resets the internal variables (requires new call of init)
+    
+    
+    for(int i = 0; i < m_iNumberOfChannels; i++){
+        delete pCRingBuff[i];
+    }
+    
+    m_fSampleRate = 0;
+    m_iNumberOfChannels = 0;
+    m_ParamGain = 0.;
+    M_ParamDelay = 0.;
+    
+    m_bIsInitialized = false;
+    
     
     return Error_t::kNoError;
 }
@@ -78,8 +97,9 @@ Error_t CCombFilterBase::process (float **ppfInputBuffer, float **ppfOutputBuffe
     for (int i = 0; i < iNumberOfFrames; i++){
         for (int c = 0; c < m_iNumberOfChannels; c++)
         {
-            float a = ppfInputBuffer[c][i];
-            ppfOutputBuffer[c][i] = a;
+
+            ppfOutputBuffer[c][i] = pCRingBuff[c]->getPostInc();
+            pCRingBuff[c]->putPostInc(ppfInputBuffer[c][i]);
             
         }
         

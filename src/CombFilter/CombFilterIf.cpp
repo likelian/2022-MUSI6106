@@ -24,7 +24,7 @@ CCombFilterIf::CCombFilterIf () :
     m_fSampleRate(0)
 {
     // this should never hurt
-    this->reset ();
+    //this->reset ();
 }
 
 
@@ -99,6 +99,7 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
         m_pCCombFilter = new CIIRComb ();
     }
     
+    
     Error_t initError = m_pCCombFilter->init(fMaxDelayLengthInS, fSampleRateInHz, iNumChannels);
     
     m_bIsInitialized = true;
@@ -109,6 +110,8 @@ Error_t CCombFilterIf::init (CombFilterType_t eFilterType, float fMaxDelayLength
 Error_t CCombFilterIf::reset ()
 {
     //resets the internal variables (requires new call of init)
+    
+    m_pCCombFilter->reset();
     
     return Error_t::kNoError;
 }

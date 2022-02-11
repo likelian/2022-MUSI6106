@@ -99,10 +99,9 @@ private:
     float           m_ParamGain;         //!< gain as factor (usually -1...1)
     float           M_ParamDelay;        //!< delay in seconds for specification of comb width
     
+    CRingBuffer<float> **pCRingBuff;
+    
 };
-
-
-
 
 
 #endif /* CombFilter_h */
