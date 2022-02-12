@@ -125,7 +125,12 @@ Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
             if (fParamValue < 0. || fParamValue >= m_fMaxDelayLengthInS){
                 return Error_t::kFunctionInvalidArgsError;
             }
+            
             m_ParamDelay = fParamValue;
+            m_iDelayinSamples = (int) (m_ParamDelay * m_fSampleRate);
+            for (int c = 0; c < m_iNumberOfChannels; c++){
+                pCRingBuff[c]->setReadPtr(m_iDelayinSamples);
+            }
             
         case kNumFilterParams:kNumFilterParams:
             break;

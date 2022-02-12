@@ -87,27 +87,27 @@ int main(int argc, char* argv[])
     pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
     
     
-    float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
-    float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
     
-    cout << "gain: " << gain << endl;
-    cout << "delay: " << delay << endl;
+    //cout << "gain: " << gain << endl;
+    //cout << "delay: " << delay << endl;
     
     
     
     pCCombFilter->reset();
     
-    pCCombFilter->init(CCombFilterIf::kCombIIR, 0.5, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.5, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, 0.9);
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, 0.01);
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
     
     
-    float gain_two = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
-    float delay_two = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+    float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+    float delay = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
     
-    cout << "gain_two: " << gain << endl;
-    cout << "delay_two: " << delay << endl;
+    cout << "gain: " << gain << endl;
+    cout << "delay: " << delay << endl;
     
     
     ///////////////////Comb
@@ -162,19 +162,21 @@ int main(int argc, char* argv[])
         pCCombFilter->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
         
 
-        cout << "\r" << "reading and writing";
+        
         
         phAudioWriteFile->writeData(ppfOutputBuffer, iNumFrames);
-
-        // write
-        for (int i = 0; i < iNumFrames; i++)
-        {
-            for (int c = 0; c < stFileSpec.iNumChannels; c++)
-            {
-                hOutputFile << ppfAudioData[c][i] << "\t";
-            }
-            hOutputFile << endl;
-        }
+        
+//        cout << "\r" << "reading and writing";
+//
+//        // write
+//        for (int i = 0; i < iNumFrames; i++)
+//        {
+//            for (int c = 0; c < stFileSpec.iNumChannels; c++)
+//            {
+//                hOutputFile << ppfAudioData[c][i] << "\t";
+//            }
+//            hOutputFile << endl;
+//        }
     }
 
     cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;

@@ -96,6 +96,7 @@ protected:
     
     float           m_ParamGain;         //!< gain as factor (usually -1...1)
     float           m_ParamDelay;        //!< delay in seconds for specification of comb width
+    int             m_iDelayinSamples;   //!< delay in samples for specification of comb width
     
     float           m_fMaxDelayLengthInS; //!< maximum delay in seconds
     

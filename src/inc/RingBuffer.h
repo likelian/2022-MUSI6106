@@ -36,6 +36,10 @@ public:
         delete [] m_PtRingBuff;
         m_PtRingBuff = 0;
     }
+    
+    void setReadPtr(int iDelayInSamples){
+        m_iReadPtr = m_iBuffLength - iDelayInSamples;
+    }
 
     /*! add a new value of type T to write index and increment write index
     \param tNewValue the new value
