@@ -20,8 +20,12 @@ int main(int argc, char* argv[])
     std::string sInputFilePath,                 //!< file paths
                 sOutputFilePath,
                 audioOuputFilePath;
-
-    static const int kBlockSize = 1024;
+    
+    static const int kBlockSize = 512;
+    //static const int kBlockSize = 1024;
+    //static const int kBlockSize = 2048;
+    //static const int kBlockSize = 4096;
+    
 
     clock_t time = 0;
 
@@ -81,23 +85,22 @@ int main(int argc, char* argv[])
     CCombFilterIf::create(pCCombFilter);
     
     
-    pCCombFilter->init(CCombFilterIf::kCombIIR, 0.1, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+//    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.1, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+//
+//    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
+//    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
+//
+//
+//    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
+//    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
+//
+//    //cout << "gain: " << gain << endl;
+//    //cout << "delay: " << delay << endl;
+//
+//    
+//    pCCombFilter->reset();
     
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
-    
-    
-    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
-    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
-    
-    //cout << "gain: " << gain << endl;
-    //cout << "delay: " << delay << endl;
-    
-    
-    
-    pCCombFilter->reset();
-    
-    pCCombFilter->init(CCombFilterIf::kCombIIR, 0.5, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.2, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     
     pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
     pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));

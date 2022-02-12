@@ -1,3 +1,7 @@
+
+An example of command line arugments:
+/Users/likelian/Desktop/Audio_software/Input/freesound.wav /Users/likelian/Desktop/Audio_software/Output/output.wav Gain 0.5 Delay 0.01
+
 ![iircomb_left_compare_swwep](/Output/sweep/iir_left.png)
 iircomb_left_compare_swwep
 
