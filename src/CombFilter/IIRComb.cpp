@@ -15,9 +15,10 @@ Error_t CIIRComb::process (float **ppfInputBuffer, float **ppfOutputBuffer, int 
         for (int c = 0; c < m_iNumberOfChannels; c++)
         {
 
-            ppfOutputBuffer[c][i] = 0.5 * (ppfInputBuffer[c][i] + pCRingBuff[c]->getPostInc());
+            ppfOutputBuffer[c][i] = ppfInputBuffer[c][i] +
+                                           m_ParamGain * pCRingBuff[c]->getPostInc();
             
-            pCRingBuff[c]->putPostInc(m_ParamGain * ppfOutputBuffer[c][i]);
+            pCRingBuff[c]->putPostInc(ppfOutputBuffer[c][i]);
             
         }
         

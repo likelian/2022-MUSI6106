@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     
     pCCombFilter->reset();
     
-    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.5, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
+    pCCombFilter->init(CCombFilterIf::kCombIIR, 0.5, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     
     pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
     pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
