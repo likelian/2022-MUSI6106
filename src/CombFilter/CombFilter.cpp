@@ -31,17 +31,17 @@ CCombFilterBase::CCombFilterBase () :
 }
 
 
-CCombFilterBase::~CCombFilterBase ()
-{
-    this->reset ();
-}
+//CCombFilterBase::~CCombFilterBase ()
+//{
+//    this->reset ();
+//}
 
 
-Error_t CCombFilterBase::create(CCombFilterBase *&pCCombFilter)
-{
-    
-    return Error_t::kNoError;
-}
+//Error_t CCombFilterBase::create(CCombFilterBase *&pCCombFilter)
+//{
+//    
+//    return Error_t::kNoError;
+//}
 
 
 Error_t CCombFilterBase::destroy(CCombFilterBase *&pCCombFilter)
@@ -81,6 +81,7 @@ Error_t CCombFilterBase::reset ()
     for(int i = 0; i < m_iNumberOfChannels; i++){
         delete pCRingBuff[i];
     }
+    delete[] pCRingBuff;
     
     m_fSampleRate = 0;
     m_iNumberOfChannels = 0;
@@ -96,16 +97,16 @@ Error_t CCombFilterBase::reset ()
 Error_t CCombFilterBase::process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames)
 {
     
-    for (int i = 0; i < iNumberOfFrames; i++){
-        for (int c = 0; c < m_iNumberOfChannels; c++)
-        {
-
-            ppfOutputBuffer[c][i] = pCRingBuff[c]->getPostInc();
-            pCRingBuff[c]->putPostInc(ppfInputBuffer[c][i]);
-            
-        }
-        
-    }
+//    for (int i = 0; i < iNumberOfFrames; i++){
+//        for (int c = 0; c < m_iNumberOfChannels; c++)
+//        {
+//
+//            ppfOutputBuffer[c][i] = pCRingBuff[c]->getPostInc();
+//            pCRingBuff[c]->putPostInc(ppfInputBuffer[c][i]);
+//
+//        }
+//
+//    }
     
     return Error_t::kNoError;
 }
@@ -116,13 +117,15 @@ Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
         
     switch(eParam){
         case FilterParam_t::kParamGain:
+            //IIR filter gets unstable if the coifficent is larger than 1.
             if (fParamValue < -1. || fParamValue > 1.){
                 return Error_t::kFunctionInvalidArgsError;
             }
             m_ParamGain = fParamValue;
             
         case FilterParam_t::kParamDelay:
-            if (fParamValue < 0. || fParamValue >= m_fMaxDelayLengthInS){
+            //fParamValue can be equal to m_fMaxDelayLengthInS ?
+            if (fParamValue < 0. || fParamValue > m_fMaxDelayLengthInS){
                 return Error_t::kFunctionInvalidArgsError;
             }
             
@@ -132,7 +135,10 @@ Error_t CCombFilterBase::setParam (int iParam, float fParamValue)
                 pCRingBuff[c]->setReadPtr(m_iDelayinSamples);
             }
             
-        case kNumFilterParams:kNumFilterParams:
+        //case kNumFilterParams:kNumFilterParams:
+        //    break;
+        default :
+            return Error_t::kFunctionIllegalCallError;
             break;
     }
     
@@ -150,7 +156,10 @@ float CCombFilterBase::getParam (int iParam) const
         case FilterParam_t::kParamDelay:
             return m_ParamDelay;
             
-        case kNumFilterParams:kNumFilterParams:
+//        case kNumFilterParams:kNumFilterParams:
+//            break;
+        default :
+            //return Error_t::kFunctionIllegalCallError;
             break;
     }
     

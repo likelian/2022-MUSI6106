@@ -71,10 +71,13 @@ Error_t CCombFilterIf::create (CCombFilterIf*& pCCombFilter)
     //CCombFilterBase * something;
     //m_pCCombFilter->create(something); //only return error
 
-    
-    if (!pCCombFilter){
-        return Error_t::kMemError;
-    }
+    /*
+     It is admirable that you check for this, but the new operator (unlike C's malloc()) does not return NULL on failure to allocate; instead it throws an exception (std::bad_alloc).
+
+     */
+//    if (!pCCombFilter){
+//        return Error_t::kMemError;
+//    }
     
     return Error_t::kNoError;
 }

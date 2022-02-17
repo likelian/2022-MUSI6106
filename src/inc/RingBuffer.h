@@ -75,8 +75,20 @@ public:
     /*! return the value at the current read index
     \return float the value from the read index
     */
-    T get() const
+    T get(float fOffset = 0.) const
     {
+        
+        int readPtr_one = (((int) (m_iReadPtr + fOffset)) + m_iBuffLength) % m_iBuffLength;
+        int readPtr_two = (readPtr_one + 1 + m_iBuffLength) % m_iBuffLength;
+        
+        T value_one = m_PtRingBuff[readPtr_one];
+        T value_two = m_PtRingBuff[readPtr_two];
+        
+        float offset_ratio = fOffset - (int)fOffset;
+        T output =  ((1. - offset_ratio) * value_one + offset_ratio * value_two) / 2.;
+        
+        //return output;
+        
         return m_PtRingBuff[m_iReadPtr];
     }
     

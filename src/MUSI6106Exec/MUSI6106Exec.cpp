@@ -21,10 +21,27 @@ int main(int argc, char* argv[])
                 sOutputFilePath,
                 audioOuputFilePath;
     
-    static const int kBlockSize = 512;
-    //static const int kBlockSize = 1024;
-    //static const int kBlockSize = 2048;
-    //static const int kBlockSize = 4096;
+    
+    CCombFilterIf::CombFilterType_t FilterType = CCombFilterIf::kCombFIR;
+    if (strcmp(argv[7], "FIR")){
+        //CCombFilterIf::CombFilterType_t FilterType = CCombFilterIf::kCombFIR;
+    } else if (strcmp(argv[7], "IIR")){
+        CCombFilterIf::CombFilterType_t FilterType = CCombFilterIf::kCombIIR;
+    }else{
+        throw "no proper filter type. Choose from FIR or IIR";
+        return 0;
+    }
+    
+    if (std::atof(argv[4]) < 2){
+        cout << std::atof(argv[4]);
+        throw "Block size too small";
+        return 0;
+    }
+    static const int kBlockSize = std::atof(argv[4]);
+    
+    
+    float MaxDelayTimeInS = std::atof(argv[12]);
+    
     
 
     clock_t time = 0;
@@ -85,25 +102,10 @@ int main(int argc, char* argv[])
     CCombFilterIf::create(pCCombFilter);
     
     
-//    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.1, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-//
-//    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
-//    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
-//
-//
-//    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
-//    pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamDelay);
-//
-//    //cout << "gain: " << gain << endl;
-//    //cout << "delay: " << delay << endl;
-//
-//    
-//    pCCombFilter->reset();
+    pCCombFilter->init(FilterType, MaxDelayTimeInS, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
     
-    pCCombFilter->init(CCombFilterIf::kCombFIR, 0.2, stFileSpec.fSampleRateInHz, stFileSpec.iNumChannels);
-    
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[4]));
-    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[6]));
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamGain, std::atof(argv[8]));
+    pCCombFilter->setParam(CCombFilterIf::FilterParam_t::kParamDelay, std::atof(argv[10]));
     
     
     float gain = pCCombFilter->getParam(CCombFilterIf::FilterParam_t::kParamGain);
@@ -165,21 +167,8 @@ int main(int argc, char* argv[])
         pCCombFilter->process(ppfAudioData, ppfOutputBuffer, iNumFrames);
         
 
-        
-        
         phAudioWriteFile->writeData(ppfOutputBuffer, iNumFrames);
         
-//        cout << "\r" << "reading and writing";
-//
-//        // write
-//        for (int i = 0; i < iNumFrames; i++)
-//        {
-//            for (int c = 0; c < stFileSpec.iNumChannels; c++)
-//            {
-//                hOutputFile << ppfAudioData[c][i] << "\t";
-//            }
-//            hOutputFile << endl;
-//        }
     }
 
     cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;

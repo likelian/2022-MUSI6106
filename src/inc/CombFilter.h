@@ -41,7 +41,7 @@ public:
     \param pCCombFilter  pointer to the new class
     \return Error_t
     */
-    Error_t create (CCombFilterBase*& pCCombFilter);
+//    Error_t create (CCombFilterBase*& pCCombFilter);
     
     /*! destroys a comb filter instance
     \param pCCombFilter pointer to the class to be destroyed
@@ -85,7 +85,7 @@ public:
     virtual Error_t process (float **ppfInputBuffer, float **ppfOutputBuffer, int iNumberOfFrames);
 
     CCombFilterBase ();
-    virtual ~CCombFilterBase ();
+    //virtual ~CCombFilterBase ();
     
 protected:
     bool            m_bIsInitialized;   //!< internal bool to check whether the init function has been called
@@ -101,6 +101,11 @@ protected:
     float           m_fMaxDelayLengthInS; //!< maximum delay in seconds
     
     CRingBuffer<float> **pCRingBuff;
+    
+    /*
+     To follow the naming convention of the other members, these should be m_fParamGain and m_fParamDelay, since they are floats.
+     (My own preference is to dispense with the prefixes altogether)
+     */
     
 private:
     
