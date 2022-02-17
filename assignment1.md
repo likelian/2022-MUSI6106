@@ -9,19 +9,32 @@ I have plots from my own testing in assignment1_test.md. I thought that's the on
 
 test1: FIR: Output is zero if input freq matches feedforward
 
+#run matlab test1 (change audiowrite to freesoud.wav)
+
+/Users/likelian/Desktop/Audio_software/Input/freesound.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter FIR Gain 1. Delay 0.005 Max_delay 1
+
 run matlab test1
 
-/Users/likelian/Desktop/Audio_software/Input/sine.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter FIR Gain 1. Delay 0.005 Max_delay 1
+#run matlab test1 (change audiowrite to sweep.wav)
+
+/Users/likelian/Desktop/Audio_software/Input/sweep.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter FIR Gain 1. Delay 0.005 Max_delay 1
 
 run matlab test1
-
 
 
 test2: IIR: amount of magnitude increase/decrease if input freq matches feedback
 
+
+#run matlab test2 (change audiowrite to freesoud.wav)
+
+/Users/likelian/Desktop/Audio_software/Input/freesound.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter IIR Gain 1. Delay 0.005 Max_delay 1
+
 run matlab test2
 
-/Users/likelian/Desktop/Audio_software/Input/sine.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter IIR Gain 1. Delay 0.005 Max_delay 1
+
+#run matlab test2 (change audiowrite to sweep.wav)
+
+/Users/likelian/Desktop/Audio_software/Input/sweep.wav /Users/likelian/Desktop/Audio_software/Output output.wav  BlockSize 512 Filter IIR Gain 1. Delay 0.005 Max_delay 1
 
 run matlab test2
 
