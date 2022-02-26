@@ -5,6 +5,7 @@
 #include "MUSI6106Config.h"
 
 #include "AudioFileIf.h"
+#include "Fft.h"
 
 using std::cout;
 using std::endl;
@@ -28,6 +29,11 @@ int main(int argc, char* argv[])
     CAudioFileIf* phAudioFile = 0;
     std::fstream            hOutputFile;
     CAudioFileIf::FileSpec_t stFileSpec;
+    
+    
+    CFft* pCFft;
+    //float* pfMag;
+    
 
     showClInfo();
 
@@ -55,6 +61,20 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
+    
+    
+    CFft::createInstance(pCFft);
+
+    const int iBlockLength = 1024;
+    const int iZeroPadFactor = 512;
+    const int iSpecLength = (iBlockLength * iZeroPadFactor)/2+1;
+    
+    float* pfMag = new float[iSpecLength]();
+    
+    pCFft->initInstance(iBlockLength, iZeroPadFactor);
+    
+    CFft::complex_t* pfSpectrum[iBlockLength * iZeroPadFactor];
+    
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -96,6 +116,8 @@ int main(int argc, char* argv[])
 
         // read data (iNumOfFrames might be updated!)
         phAudioFile->readData(ppfAudioData, iNumFrames);
+        
+        
 
         cout << "\r" << "reading and writing";
 
@@ -105,6 +127,13 @@ int main(int argc, char* argv[])
             for (int c = 0; c < stFileSpec.iNumChannels; c++)
             {
                 hOutputFile << ppfAudioData[c][i] << "\t";
+                
+                
+                
+                pCFft->doFft(pfSpectrum, ppfAudioData[c]);
+                
+                pCFft->getMagnitude(pfMag, pfSpectrum);
+                
             }
             hOutputFile << endl;
         }
@@ -121,6 +150,10 @@ int main(int argc, char* argv[])
         delete[] ppfAudioData[i];
     delete[] ppfAudioData;
     ppfAudioData = 0;
+    
+    CFft::destroyInstance(pCFft);
+    delete pfSpectrum;
+    pfSpectrum = 0;
 
     // all done
     return 0;
