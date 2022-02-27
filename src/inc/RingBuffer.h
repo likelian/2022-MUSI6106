@@ -70,8 +70,6 @@ public:
         float fraction = fOffset-floor(fOffset);
         float value = (1 - fraction)*m_ptBuff[index] + fraction*m_ptBuff[index+1];
 
-        incIdx(m_iReadIdx);
-
         return value;
     }
 
