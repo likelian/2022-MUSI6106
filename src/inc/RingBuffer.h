@@ -65,8 +65,14 @@ public:
     */
     T get(float fOffset = 0) const
     {
-        assert(0); // TODO: implement offset
-        return m_ptBuff[m_iReadIdx];
+        int index = fOffset + m_iReadIdx > 0 ? int(fOffset) + m_iReadIdx : floor(fOffset) + m_iReadIdx + m_iBuffLength;
+
+        float fraction = fOffset-floor(fOffset);
+        float value = (1 - fraction)*m_ptBuff[index] + fraction*m_ptBuff[index+1];
+
+        incIdx(m_iReadIdx);
+
+        return value;
     }
 
     /*! set buffer content and indices to 0
