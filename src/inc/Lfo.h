@@ -44,44 +44,57 @@ public:
     //reset
     void reset()
     {
-        mPhase = 0.0;
+        mReadIdx = 0.0;
         mTable = new float[mTableLength];
     }
     
     
-    
     /*
-     inRate in Hz
-     inDepth in amplitude
-     inNumSamplesToRender in int
+     inFreq, frequency in Hz
+     inAmp, amplitude range from 0. to 1.
+     inNumSamplesToRender, the length of output buffer
+    
+     mBuffer is filled, but not returned
      */
-    void process(float inRate,
-                 float inDepth,
+    void process(float inFreq = 440.f,
+                 float inAmp  = .5f,
                  int inNumSamplesToRender)
     {
-        assert(inRate > 0.f);
-        assert(inDepth > 0.f || inDepth < 1.f);
-        assert(inNumSamplesToRender > 0);
+        assert(inFreq > 0.f); //negative frequency
+        assert(inFreq <= 0.5f * (float) mSampleRate); //alising
+        assert(inDepth >= 0.f || inDepth <= 1.f); //amplitude range
+        assert(inNumSamplesToRender > 0); //positive buffer size
         
-        std::cout << "mTableLength" << mTableLength << std::endl;
-        std::cout << "mTable[10]" << mTable[10] << std::endl;
         
         //allocate the output buffer
         mBuffer = new float[inNumSamplesToRender];
         
-        const float increment = inRate / mSampleRate;
+        //increment in samples
+        const float increment = inFreq * mTableLength / mSampleRate;
+        
         
         for(int i = 0; i < inNumSamplesToRender; i++){
             
-            mPhase += increment;
+            //increment the readIdx by floating point samples
+            mReadIdx += increment;
             
-            if(mPhase > 1.f){
-                mPhase = mPhase - 1.f;
+            
+            const float fTableLength = (float)mTableLength;
+            //wrap around
+            while (mReadIdx >= fTableLength){
+                mReadIdx -= fTableLength;
+            }
+            //wrap around for mReadIdx+1
+            if (mReadIdx+1 >= fTableLength){
+                mReadIdx -= fTableLength;
             }
             
-            //float tableIdx = mPhase * mTableLength;
-            int tableIdx = (int)(mPhase * mTableLength);
-            mBuffer[i] = mTable[tableIdx]; //lookup the wavetable
+            //fraction ratio
+            float fraction = mReadIdx-floor(mReadIdx);
+            //linear interpolation
+            const int iReadIdx = (int)mReadIdx;
+            float interpolated = (1 - fraction) * mTable[iReadIdx] + fraction * mTable[iReadIdx+1];
+            mBuffer[i] = interpolated; //put value into output buffer
         }
     }
     
@@ -95,7 +108,7 @@ private:
     float mSampleRate;
     int mTableLength;
     float* mTable;
-    float mPhase;
+    float mReadIdx;
     float* mBuffer;
 };
 #endif /* Lfo_h */
