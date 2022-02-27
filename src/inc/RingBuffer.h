@@ -63,7 +63,7 @@ public:
     \param fOffset: read at offset from read index
     \return float the value from the read index
     */
-    T get(float fOffset = 0) const
+    float get(float fOffset = 0) const
     {
         int index = fOffset + m_iReadIdx > 0 ? int(fOffset) + m_iReadIdx : floor(fOffset) + m_iReadIdx + m_iBuffLength;
 
