@@ -15,10 +15,13 @@ class Lfo
 public:
     //constructor
     Lfo():
+    isInitialized(0),
     mSampleRate(0),
     mTableLength(0),
     mTable(0),
-    mReadIdx(0)
+    mReadIdx(0),
+    mFrequency(0),
+    mAmplitude(0)
 //    mBuffer(0)
     {
         //reset();
@@ -52,13 +55,24 @@ public:
     {
         mSampleRate = inSampleRate;
     }
-    
+
+    void setLFOFrequency(float frequency)
+    {
+        mFrequency = frequency;
+    }
+
+    void setLFOAmplitude(float amplitude)
+    {
+        mAmplitude = amplitude;
+    }
     
     //reset
     void reset()
     {
         mReadIdx = 0.f;
         mTable = new float[mTableLength];
+        lfoRingBuffer->reset();
+
     }
     
     
@@ -69,6 +83,7 @@ public:
     
      mBuffer is filled, but not returned
      */
+//    TODO: check for numSamplesToRender > 25000
     void process(int inNumSamplesToRender,
                  float inFreq = 440.f,
                  float inAmp  = 0.5f)
@@ -124,16 +139,21 @@ public:
 //        return mBuffer;
 //    }
 
+
+
     CRingBuffer<float>* getRingBuffer()
     {
         return  lfoRingBuffer;
     }
     
 private:
+    bool isInitialized;
     int mSampleRate;
     int mTableLength;
     float* mTable;
     float mReadIdx;
+    float mFrequency;
+    float mAmplitude;
 //    float* mBuffer;
     CRingBuffer<float>* lfoRingBuffer;
 

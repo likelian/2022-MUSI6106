@@ -26,7 +26,7 @@ protected:
         {
             for (int j = 0; j < numSamples; j++)
             {
-                inputBuffer[i][j] = j;
+                inputBuffer[i][j] = 1;
             }
         }
 
@@ -62,12 +62,12 @@ TEST_F(Vibrato, sanityCheck)
 {
     std::ofstream fOutput("output.txt");
 
-    vibrato->init(0.5, 0.01, 16000, 2);
+    vibrato->init(0.5, 0.01, 16000, 0.5,10, 2);
     vibrato->process(inputBuffer,outputBuffer,numSamples);
 
     for (int c = 0; c < numChannels; c++) {
         for (int i = 0; i < numSamples; i++) {
-            fOutput << inputBuffer[c][i] << " " << outputBuffer[c][i] << "\n";
+            fOutput << inputBuffer[c][i] << "\t" << outputBuffer[c][i] << "\n";
         }
     }
 
