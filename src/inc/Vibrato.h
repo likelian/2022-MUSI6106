@@ -106,7 +106,7 @@ private:
     bool  m_bIsInitialized;   //!< internal bool to check whether the init function has been called
     int m_Delay;
     int m_Width;
-    CRingBuffer<float> **m_InputBuffer;
+    CRingBuffer<float> **m_DelayLine;
     float m_fSampleRate; //!< audio sample rate in Hz
     int m_iNumChannels;
     Lfo* lfo;
