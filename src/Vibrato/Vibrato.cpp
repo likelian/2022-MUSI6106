@@ -22,19 +22,22 @@ Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, int iN
     this->setWidth(fWidth*fSampleRateInHz);
     this->m_iNumChannels = iNumChannels;
     m_DelayLine = new CRingBuffer<float>*[iNumChannels];
-    for (int i = 0; i < iNumChannels; i++)
-    {
+    for (int i = 0; i < iNumChannels; i++) {
         m_DelayLine[i] = new CRingBuffer<float>(m_Delay + m_Width + 2);
-
-        for (int j = 0; j < m_Delay  + m_Width + 2; j++)
-        {
-            m_DelayLine[i]->putPostInc(0);
-        }
-        m_DelayLine[i]->setReadIdx(0);
-        m_DelayLine[i]->setWriteIdx(m_Delay);
     }
+        for (int i = 0; i < m_Delay + m_Width + 2 ; i++) {
+            for (int j = 0; j < iNumChannels; j++) {
+                m_DelayLine[j]->putPostInc(0);
+            }
+        }
+        for (int i = 0; i < iNumChannels; i++) {
+            m_DelayLine[i]->setReadIdx(0);
+            m_DelayLine[i]->setWriteIdx(m_Delay);
+        }
 
-    lfo->process(16000);
+    lfo = new Lfo();
+    lfo->setSampleRate(16000);
+    lfo->process(16000,10);
     m_sineBuffer = lfo->getRingBuffer();
 
 
@@ -68,8 +71,9 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
 
     for (int c = 0; c < m_iNumChannels; c++) {
         for (int i = 0; i < iNumberOfFrames; i++) {
-            m_DelayLine[c][i].putPostInc(ppfInputBuffer[c][i]);
-            ppfOutputBuffer[c][i] = ppfInputBuffer[c][i] + m_DelayLine[c]->getPostInc(m_sineBuffer->getPostInc(0));
+            m_DelayLine[c]->putPostInc(ppfInputBuffer[c][i]);
+            float offset = m_sineBuffer->getPostInc(0);
+            ppfOutputBuffer[c][i] = ppfInputBuffer[c][i] + m_DelayLine[c]->getPostInc(offset*m_Delay);
 
         }
 

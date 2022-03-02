@@ -52,7 +52,7 @@ protected:
     float** inputBuffer = 0;
     float** outputBuffer = 0;
     int numChannels = 2;
-    int numSamples = 100;
+    int numSamples = 48000;
     CVibrato* vibrato;
 
 
@@ -62,7 +62,7 @@ TEST_F(Vibrato, sanityCheck)
 {
     std::ofstream fOutput("output.txt");
 
-    vibrato->init(0.5, 0.5, 16000, 2);
+    vibrato->init(0.5, 0.01, 16000, 2);
     vibrato->process(inputBuffer,outputBuffer,numSamples);
 
     for (int c = 0; c < numChannels; c++) {

@@ -65,7 +65,7 @@ public:
     */
     float get(float fOffset = 0) const
     {
-        int index = fOffset + m_iReadIdx > 0 ? int(fOffset) + m_iReadIdx : floor(fOffset) + m_iReadIdx + m_iBuffLength;
+        int index = fOffset + m_iReadIdx >= 0 ? int(fOffset) + m_iReadIdx : floor(fOffset) + m_iReadIdx + m_iBuffLength;
 
         float fraction = fOffset-floor(fOffset);
         float value = (index + 1 >= m_iBuffLength) ?  (1 - fraction)*m_ptBuff[index] + fraction*m_ptBuff[0] : (1 - fraction)*m_ptBuff[index] + fraction*m_ptBuff[index+1];
