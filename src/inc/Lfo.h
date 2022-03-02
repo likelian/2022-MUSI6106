@@ -7,6 +7,7 @@
 #ifndef Lfo_h
 #define Lfo_h
 #include <math.h>
+#include "RingBuffer.h"
 #pragma once
 class Lfo
 {
@@ -17,8 +18,8 @@ public:
     mSampleRate(0),
     mTableLength(0),
     mTable(0),
-    mReadIdx(0),
-    mBuffer(0)
+    mReadIdx(0)
+//    mBuffer(0)
     {
         //reset();
         mTableLength = 25000;
@@ -39,8 +40,10 @@ public:
     {
         delete [] mTable;
         mTable = 0;
-        delete [] mBuffer;
-        mBuffer = 0;
+//        delete [] mBuffer;
+//        mBuffer = 0;
+        delete [] lfoRingBuffer;
+
     }
     
     
@@ -77,7 +80,8 @@ public:
         
         
         //allocate the output buffer
-        mBuffer = new float[inNumSamplesToRender];
+//        mBuffer = new float[inNumSamplesToRender];
+        lfoRingBuffer = new CRingBuffer<float>(inNumSamplesToRender);
         
         //increment in samples
         float increment = inFreq * mTableLength / mSampleRate;
@@ -109,15 +113,20 @@ public:
             //linear interpolation
             float interpolated = (1 - fraction) * mTable[iReadIdx] + fraction * mTable[iReadIdxLast];
             
-            mBuffer[i] = inAmp * interpolated; //put value into output buffer
-            
+//            mBuffer[i] = inAmp * interpolated; //put value into output buffer
+            lfoRingBuffer->putPostInc(inAmp * interpolated);
         }
     }
     
     
-    float* getBuffer()
+//    float* getBuffer()
+//    {
+//        return mBuffer;
+//    }
+
+    CRingBuffer<float>* getRingBuffer()
     {
-        return mBuffer;
+        return  lfoRingBuffer;
     }
     
 private:
@@ -125,6 +134,8 @@ private:
     int mTableLength;
     float* mTable;
     float mReadIdx;
-    float* mBuffer;
+//    float* mBuffer;
+    CRingBuffer<float>* lfoRingBuffer;
+
 };
 #endif /* Lfo_h */
