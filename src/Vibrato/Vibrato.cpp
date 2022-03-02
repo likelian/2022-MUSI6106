@@ -6,9 +6,12 @@ Error_t CVibrato::create(CVibrato *&pcVibrato) {
     pcVibrato = new CVibrato();
 }
 
-Error_t CVibrato::destroy(CVibrato *&pCCombFilterIf) {
+Error_t CVibrato::destroy(CVibrato *&pcVibrato) {
 
+    pcVibrato->reset ();
 
+    delete pcVibrato;
+    pcVibrato = 0;
 
 }
 
@@ -17,7 +20,7 @@ Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, int iN
     m_bIsInitialized = 1;
     this->setDelay(fDelay*fSampleRateInHz);
     this->setWidth(fWidth*fSampleRateInHz);
-
+    this->m_iNumChannels = iNumChannels;
     m_InputBuffer = new CRingBuffer<float>*[iNumChannels];
     for (int i = 0; i < iNumChannels; i++)
     {
@@ -30,8 +33,10 @@ Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, int iN
         m_InputBuffer[i]->setReadIdx(0);
         m_InputBuffer[i]->setWriteIdx(m_Delay);
     }
+
     lfo->process(16000);
-    this->m_sineBuffer = lfo->getRingBuffer();
+    m_sineBuffer = lfo->getRingBuffer();
+
 
 }
 
@@ -44,7 +49,7 @@ Error_t CVibrato::reset() {
 
        this->setDelay(0);
        this->setWidth(0);
-    m_InputBuffer = 0;
+       m_InputBuffer = 0;
        m_sineBuffer = 0;
 
        m_bIsInitialized = false;
