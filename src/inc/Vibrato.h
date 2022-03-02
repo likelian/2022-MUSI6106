@@ -3,6 +3,7 @@
 
 #include "ErrorDef.h"
 #include "RingBuffer.h"
+#include "Lfo.h"
 
 //class CCombFilterBase; // in case you intend to add an internal base class that the user doesn't see (not required)
 
@@ -54,7 +55,7 @@ public:
     \param pCCombFilterIf pointer to the new class
     \return Error_t
     */
-    static Error_t create (CVibrato*& pCCombFilterIf);
+    static Error_t create (CVibrato*& pcVibrato);
 
     /*! destroys a comb filter instance
     \param pCCombFilterIf pointer to the class to be destroyed
@@ -87,7 +88,7 @@ public:
     \param eParam
     \return float
     */
-    float   setWidth (float fWidth) const;
+    float   setWidth (float fWidth);
 
     /*! processes one block of audio
     \param ppfInputBuffer input buffer [numChannels][iNumberOfFrames]
@@ -103,10 +104,13 @@ protected:
 
 private:
     bool  m_bIsInitialized;   //!< internal bool to check whether the init function has been called
-    float m_Delay;
-    float m_Width;
-    CRingBuffer<float> *m_RingBuffer;
-    float           m_fSampleRate;      //!< audio sample rate in Hz
+    int m_Delay;
+    int m_Width;
+    CRingBuffer<float> **m_RingBuffer;
+    float m_fSampleRate; //!< audio sample rate in Hz
+    int m_iNumChannels;
+    Lfo* lfo;
+    float* sineBuffer;
 };
 
 #endif // #if !defined(__CombFilterIf_hdr__)
