@@ -106,11 +106,11 @@ private:
     bool  m_bIsInitialized;   //!< internal bool to check whether the init function has been called
     int m_Delay;
     int m_Width;
-    CRingBuffer<float> **m_RingBuffer;
+    CRingBuffer<float> **m_InputBuffer;
     float m_fSampleRate; //!< audio sample rate in Hz
     int m_iNumChannels;
     Lfo* lfo;
-    float* sineBuffer;
+    CRingBuffer<float> *m_sineBuffer;
 };
 
 #endif // #if !defined(__CombFilterIf_hdr__)

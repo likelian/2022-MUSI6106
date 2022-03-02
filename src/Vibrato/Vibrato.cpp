@@ -18,34 +18,34 @@ Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, int iN
     this->setDelay(fDelay*fSampleRateInHz);
     this->setWidth(fWidth*fSampleRateInHz);
 
-    m_RingBuffer = new CRingBuffer<float>*[iNumChannels];
+    m_InputBuffer = new CRingBuffer<float>*[iNumChannels];
     for (int i = 0; i < iNumChannels; i++)
     {
-        m_RingBuffer[i] = new CRingBuffer<float>(m_Delay  + m_Width + 2);
+        m_InputBuffer[i] = new CRingBuffer<float>(m_Delay + m_Width + 2);
 
         for (int j = 0; j < m_Delay  + m_Width + 2; j++)
         {
-            m_RingBuffer[i]->putPostInc(0);
+            m_InputBuffer[i]->putPostInc(0);
         }
-        m_RingBuffer[i]->setReadIdx(0);
-        m_RingBuffer[i]->setWriteIdx(m_Delay);
+        m_InputBuffer[i]->setReadIdx(0);
+        m_InputBuffer[i]->setWriteIdx(m_Delay);
     }
     lfo->process(16000);
-    this->sineBuffer = lfo->getBuffer();
+    this->m_sineBuffer = lfo->getRingBuffer();
 
 }
 
 Error_t CVibrato::reset() {
    if (m_bIsInitialized)
    {
-       delete m_RingBuffer;
-       delete sineBuffer;
+       delete m_InputBuffer;
+       delete m_sineBuffer;
    }
 
        this->setDelay(0);
        this->setWidth(0);
-       m_RingBuffer = 0;
-       sineBuffer = 0;
+    m_InputBuffer = 0;
+       m_sineBuffer = 0;
 
        m_bIsInitialized = false;
 
@@ -63,8 +63,8 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
 
     for (int c = 0; c < m_iNumChannels; c++) {
         for (int i = 0; i < iNumberOfFrames; i++) {
-            m_RingBuffer[c][i].putPostInc(ppfInputBuffer[c][i]);
-
+            m_InputBuffer[c][i].putPostInc(ppfInputBuffer[c][i]);
+            ppfOutputBuffer[c][i] = ppfInputBuffer[c][i] + m_InputBuffer[c]->getPostInc(m_sineBuffer->getPostInc(0));
 
         }
 
@@ -75,7 +75,7 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
 CVibrato::CVibrato() {
     m_fSampleRate = 0;
     m_Delay = 0;
-    m_RingBuffer = 0;
+    m_InputBuffer = 0;
     m_Width = 0;
 }
 
