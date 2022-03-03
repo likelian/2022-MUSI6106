@@ -31,7 +31,7 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
     m_DelayLine = new CRingBuffer<float>*[iNumChannels];
 
     for (int i = 0; i < iNumChannels; i++) {
-        m_DelayLine[i] = new CRingBuffer<float>(m_Delay + m_Width + 2);
+        m_DelayLine[i] = new CRingBuffer<float>(m_Delay + m_Width*2 + 2);
     }
 
 
@@ -49,7 +49,7 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
 // Creating LFO for given frequency
     lfo = new Lfo();
     lfo->setSampleRate(fSampleRateInHz);
-    lfo->process(16000,LFOFrequency, LFOAmplitude);
+    lfo->process(fSampleRateInHz,LFOFrequency, LFOAmplitude);
 
     m_sineBuffer = lfo->getRingBuffer();
 
@@ -88,7 +88,7 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
         for (int i = 0; i < iNumberOfFrames; i++) {
 
             m_DelayLine[c]->putPostInc(ppfInputBuffer[c][i]);
-            float offset = m_Width*m_sineBuffer->getPostInc(0);
+            float offset = 1 + m_Delay + m_Width*m_sineBuffer->getPostInc(0);
             ppfOutputBuffer[c][i] = m_DelayLine[c]->getPostInc(offset);
         }
     }
