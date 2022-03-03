@@ -15,10 +15,10 @@ Error_t CVibrato::destroy(CVibrato *&pcVibrato) {
 
 }
 // TODO: Clean up init()
-Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels) {
+Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels) {
 
     m_bIsInitialized = 1;
-    this->setDelay(fDelay*fSampleRateInHz);
+    this->setDelay(fWidth*fSampleRateInHz);
     this->setWidth(fWidth*fSampleRateInHz);
     this->m_iNumChannels = iNumChannels;
     m_DelayLine = new CRingBuffer<float>*[iNumChannels];
@@ -39,7 +39,7 @@ Error_t CVibrato::init(float fWidth, float fDelay, float fSampleRateInHz, float 
             m_DelayLine[i]->setReadIdx(0);
             m_DelayLine[i]->setWriteIdx(m_Delay);
         }
-
+// Creating LFO for given frequency
     lfo = new Lfo();
     lfo->setSampleRate(16000);
     lfo->setLFOAmplitude(LFOAmplitude);
@@ -80,14 +80,12 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
 
     for (int c = 0; c < m_iNumChannels; c++) {
         for (int i = 0; i < iNumberOfFrames; i++) {
+
             m_DelayLine[c]->putPostInc(ppfInputBuffer[c][i]);
-            float offset = m_sineBuffer->getPostInc(0);
-            ppfOutputBuffer[c][i] = m_DelayLine[c]->getPostInc(offset*m_Delay);
-
+            float offset = m_Width*m_sineBuffer->getPostInc(0);
+            ppfOutputBuffer[c][i] = m_DelayLine[c]->getPostInc(offset);
         }
-
     }
-
 }
 
 CVibrato::CVibrato() {

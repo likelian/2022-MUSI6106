@@ -70,7 +70,7 @@ public:
     \param iNumChannels number of audio channels
     \return Error_t
     */
-    Error_t init (float fWidth, float fDelay, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels);
+    Error_t init (float fWidth, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels);
 
     /*! resets the internal variables (requires new call of init)
     \return Error_t
