@@ -67,13 +67,24 @@ int main(int argc, char* argv[])
         return -1;
     }
     phAudioFile->getFileSpec(stFileSpec);
-
+    
+    
+    //////////////////////////////////////////////////////////////////////////////
+    // vibrato initualization
+    float fAmp = 1.;
+    float fLFOFrequency = 10.;
+    
+    CVibrato::create(vibrato);
+    vibrato->reset();
+    vibrato->init(width, stFileSpec.fSampleRateInHz, fAmp, fLFOFrequency, stFileSpec.iNumChannels);
+    vibrato->setDelay(width);
+    
 
     //////////////////////////////////////////////////////////////////////////////
 
 
     CAudioFileIf::create(phOutputFile);
-    phAudioFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
+    phOutputFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
     if (!phOutputFile->isOpen())
     {
         cout << "Wave file open error!";
@@ -85,20 +96,23 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
     ppfAudioData = new float*[stFileSpec.iNumChannels];
+    ppfOutputData = new float*[stFileSpec.iNumChannels];
     for (int i = 0; i < stFileSpec.iNumChannels; i++) {
         ppfAudioData[i] = new float[kBlockSize];
-        ppfOutputData[i] = new float [kBlockSize];
+        ppfOutputData[i] = new float[kBlockSize];
     }
 
     if (ppfAudioData == 0)
     {
         CAudioFileIf::destroy(phAudioFile);
+        CVibrato::destroy(vibrato);
         hOutputFile.close();
         return -1;
     }
     if (ppfAudioData[0] == 0)
     {
         CAudioFileIf::destroy(phAudioFile);
+        CVibrato::destroy(vibrato);
         hOutputFile.close();
         return -1;
     }
@@ -135,6 +149,8 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
     CAudioFileIf::destroy(phAudioFile);
+    CAudioFileIf::destroy(phOutputFile);
+    CVibrato::destroy(vibrato);
     hOutputFile.close();
 
     for (int i = 0; i < stFileSpec.iNumChannels; i++) {
@@ -144,6 +160,7 @@ int main(int argc, char* argv[])
     delete[] ppfAudioData;
     delete[] ppfOutputData;
     ppfAudioData = 0;
+    ppfOutputData = 0;
 
     // all done
     return 0;
