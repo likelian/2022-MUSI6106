@@ -5,6 +5,18 @@
 #include <fstream>
 #include "gtest/gtest.h"
 
+
+namespace vibrato_test {
+    void CHECK_ARRAY_CLOSE(float* buffer1, float* buffer2, int iLength, float fTolerance)
+    {
+        for (int i = 0; i < iLength; i++)
+        {
+            EXPECT_NEAR(buffer1[i], buffer2[i], fTolerance);
+        }
+    }
+}
+
+
 class Vibrato : public testing::Test
 {
 
@@ -76,20 +88,112 @@ TEST_F(Vibrato, sanityCheck)
 }
 
 
+/*
+ Output equals delayed input when modulation amplitude is 0.
+ */
+TEST_F(Vibrato, checkZeroAmp)
+{
+    
+    //put 0. into inputBuffer
+    for (int c = 0; c < numChannels; c++)
+    {
+        for (int i = 0; i < numSamples; i++)
+        {
+            inputBuffer[c][i] = 0.;
+        }
+        
+        //put 1. in the first sample
+        inputBuffer[c][0] = 1.;
+    }
+    
+    
+    /*
+    init(float fWidth, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels)
+     */
+    float fSampleRateInHz = 16000.;
+    float fAmp = 0.;
+    float fDelayTime = 0.1;
+    float fWidth = 0.;
+    vibrato->init(fWidth, fSampleRateInHz, fAmp, 1., 2);
+    
+    
+    //set delay to 0.1s
+    vibrato->setDelay(fDelayTime);
+    vibrato->process(inputBuffer, outputBuffer, numSamples);
+
+    int iDelayInSamples = (int)(fDelayTime * fSampleRateInHz);
+    
+    for (int c = 0; c < numChannels; c++) {
+        for (int i = 0; i < numSamples; i++){
+            if (outputBuffer[c][i] == 1.){
+                std::cout << i << std::endl;
+                std::cout << iDelayInSamples << std::endl;
+            }
+        }
+        
+    }
+
+}
+
+
+/*
+ DC input stays DC ouput regardless of parametrization.
+ */
+TEST_F(Vibrato, checkDC)
+{
+    
+    //CHECK_ARRAY_CLOSE(buffer1, buffer2, iLength, fTolerance);
+}
+
+
+/*
+ Varying input block size.
+ */
+TEST_F(Vibrato, checkBlock)
+{
+    int iBlockLength_1 = 1024;
+    int iBlockLength_2 = 1025;
+    int iBlockLength_3 = 3;
+    int iBlockLength_4 = 7;
+    int iBlockLength_5 = 22223;
+    int iBlockLength_6 = 511;
+    
+    //filled buffer1 with some real numbers
+    
+    /*
+     do the vibrato and write into buffer2
+     */
+    
+}
 
 
 
+/*
+Zero input signal.
+ */
+TEST_F(Vibrato, checkZeroInput)
+{
 
-
-//namespace vibrato_test {
-//    void CHECK_ARRAY_CLOSE(float* buffer1, float* buffer2, int iLength, float fTolerance)
-//    {
-//        for (int i = 0; i < iLength; i++)
-//        {
-//            EXPECT_NEAR(buffer1[i], buffer2[i], fTolerance);
-//        }
+    
+    float fDCVal = 0.f;
+    
+//    for (i=0; i<iLength; i++){
+//        buffer1[i] = fDCVal;
 //    }
-//
-//}
+    
+}
+
+
+/*
+ One or more additional test(s) to verify other expected behaviors.
+ */
+TEST_F(Vibrato, OneMoreTest)
+{
+    
+}
+
+
+
+
 
 #endif //WITH_TESTS
