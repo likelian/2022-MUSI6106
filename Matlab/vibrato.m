@@ -1,8 +1,8 @@
 
 input_path = "../Input/";
 
-%file = "sweep";
-file = "freesound";
+file = "sweep";
+%file = "freesound";
 filename = file + ".wav";
 
 [x,Fs] = audioread(input_path + filename);
