@@ -41,11 +41,10 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
         }
 // Creating LFO for given frequency
     lfo = new Lfo();
-    lfo->setSampleRate(16000);
-    lfo->setLFOAmplitude(LFOAmplitude);
-    lfo->setLFOFrequency(LFOFrequency);
+    lfo->setSampleRate(fSampleRateInHz);
+//    lfo->setLFOAmplitude(LFOAmplitude);
 
-    lfo->process(16000,10);
+    lfo->process(16000,LFOFrequency, LFOAmplitude);
     m_sineBuffer = lfo->getRingBuffer();
 
 

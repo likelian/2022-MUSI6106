@@ -70,7 +70,7 @@ protected:
 
 };
 
-TEST_F(Vibrato, sanityCheck)
+TEST_F(Vibrato, DCCheck)
 {
     std::ofstream fOutput("CheckSineBuffer.txt");
 
