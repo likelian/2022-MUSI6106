@@ -45,7 +45,7 @@ public:
         mTable = 0;
 //        delete [] mBuffer;
 //        mBuffer = 0;
-        delete [] lfoRingBuffer;
+        delete lfoRingBuffer;
 
     }
     
