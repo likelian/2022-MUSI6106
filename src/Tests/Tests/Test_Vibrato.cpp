@@ -112,16 +112,14 @@ TEST_F(Vibrato, checkZeroAmp)
      */
     float fSampleRateInHz = 16000.;
     float fAmp = 0.;
-    float fDelayTime = 0.1;
-    float fWidth = 0.;
+    float fWidth = 0.1;
     vibrato->init(fWidth, fSampleRateInHz, fAmp, 1., 2);
     
     
     //set delay to 0.1s
-    vibrato->setDelay(fDelayTime);
     vibrato->process(inputBuffer, outputBuffer, numSamples);
 
-    int iDelayInSamples = (int)(fDelayTime * fSampleRateInHz);
+    int iDelayInSamples = (int)(fWidth * fSampleRateInHz);
     
     for (int c = 0; c < numChannels; c++) {
         for (int i = 0; i < numSamples; i++){
