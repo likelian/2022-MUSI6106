@@ -17,6 +17,13 @@ Error_t CVibrato::destroy(CVibrato *&pcVibrato) {
 // TODO: Clean up init()
 Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels) {
 
+
+    assert(fWidth > 0);
+    assert(fSampleRateInHz > 0);
+    assert(LFOAmplitude >= 0);
+    assert(LFOFrequency < 0.5*fSampleRateInHz);
+    assert(iNumChannels > 0);
+
     m_bIsInitialized = 1;
     this->setDelay(fWidth*fSampleRateInHz);
     this->setWidth(fWidth*fSampleRateInHz);
@@ -42,9 +49,8 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
 // Creating LFO for given frequency
     lfo = new Lfo();
     lfo->setSampleRate(fSampleRateInHz);
-//    lfo->setLFOAmplitude(LFOAmplitude);
-
     lfo->process(16000,LFOFrequency, LFOAmplitude);
+
     m_sineBuffer = lfo->getRingBuffer();
 
 
@@ -59,7 +65,8 @@ Error_t CVibrato::reset() {
 
        this->setDelay(0);
        this->setWidth(0);
-    m_DelayLine = 0;
+
+       m_DelayLine = 0;
        m_sineBuffer = 0;
 
        m_bIsInitialized = false;
