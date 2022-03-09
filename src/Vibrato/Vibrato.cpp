@@ -17,6 +17,13 @@ Error_t CVibrato::destroy(CVibrato *&pcVibrato) {
 // TODO: Clean up init()
 Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, float LFOFrequency,  int iNumChannels) {
 
+
+    assert(fWidth > 0);
+    assert(fSampleRateInHz > 0);
+    assert(LFOAmplitude >= 0);
+    assert(LFOFrequency < 0.5*fSampleRateInHz);
+    assert(iNumChannels > 0);
+
     m_bIsInitialized = 1;
     this->setDelay(fWidth*fSampleRateInHz);
     this->setWidth(fWidth*fSampleRateInHz);
@@ -24,7 +31,7 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
     m_DelayLine = new CRingBuffer<float>*[iNumChannels];
 
     for (int i = 0; i < iNumChannels; i++) {
-        m_DelayLine[i] = new CRingBuffer<float>(m_Delay + m_Width + 2);
+        m_DelayLine[i] = new CRingBuffer<float>(m_Delay + m_Width*2 + 2);
     }
 
 
@@ -41,11 +48,9 @@ Error_t CVibrato::init(float fWidth, float fSampleRateInHz, float LFOAmplitude, 
         }
 // Creating LFO for given frequency
     lfo = new Lfo();
-    lfo->setSampleRate(16000);
-    lfo->setLFOAmplitude(LFOAmplitude);
-    lfo->setLFOFrequency(LFOFrequency);
+    lfo->setSampleRate(fSampleRateInHz);
+    lfo->process(fSampleRateInHz,LFOFrequency, LFOAmplitude);
 
-    lfo->process(16000,10);
     m_sineBuffer = lfo->getRingBuffer();
 
 
@@ -60,7 +65,8 @@ Error_t CVibrato::reset() {
 
        this->setDelay(0);
        this->setWidth(0);
-    m_DelayLine = 0;
+
+       m_DelayLine = 0;
        m_sineBuffer = 0;
 
        m_bIsInitialized = false;
@@ -82,7 +88,7 @@ Error_t CVibrato::process(float **ppfInputBuffer, float **ppfOutputBuffer, int i
         for (int i = 0; i < iNumberOfFrames; i++) {
 
             m_DelayLine[c]->putPostInc(ppfInputBuffer[c][i]);
-            float offset = m_Width*m_sineBuffer->getPostInc(0);
+            float offset = 1 + m_Delay + m_Width*m_sineBuffer->getPostInc(0);
             ppfOutputBuffer[c][i] = m_DelayLine[c]->getPostInc(offset);
         }
     }
