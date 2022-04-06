@@ -17,6 +17,18 @@ CDtw::~CDtw( void )
 
 Error_t CDtw::init( int iNumRows, int iNumCols )
 {
+
+    //allocate a direction matrix
+    ppiDirectMatrix = new int*[iNumRows];
+    for(int i = 0; i < iNumRows; i++)
+    {
+      ppiDirectMatrix[i] = new int [iNumCols];
+    }
+    
+    mNumRows = iNumRows;
+    mNumCols = iNumCols;
+    
+    m_bIsInitialized = true;
     return Error_t::kNoError;
 }
 
@@ -34,6 +46,14 @@ Error_t CDtw::process(float **ppfDistanceMatrix)
 
     if (!ppfDistanceMatrix)
         return Error_t::kFunctionInvalidArgsError;
+    
+    
+    for(int r = 0; r < mNumRows; r++)
+    {
+        for(int c = 0; c < mNumCols; c++){
+            //fill the ppiDirectMatrix[r][c] = ?
+        }
+    }
 
 
     return Error_t::kNoError;

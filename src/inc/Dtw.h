@@ -60,6 +60,8 @@ public:
 
 private:
     bool m_bIsInitialized;
+    int ** ppiDirectMatrix;
+    int mNumRows, mNumCols;
 };
 
 
