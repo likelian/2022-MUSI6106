@@ -1,8 +1,10 @@
 
 #include "Vector.h"
 #include "Util.h"
+#include <algorithm>
 
 #include "Dtw.h"
+
 
 CDtw::CDtw( void ) :
     m_bIsInitialized(false)
@@ -48,10 +50,35 @@ Error_t CDtw::process(float **ppfDistanceMatrix)
         return Error_t::kFunctionInvalidArgsError;
     
     
-    for(int r = 0; r < mNumRows; r++)
+    //https://github.com/alexanderlerch/pyACA/blob/master/pyACA/ToolSimpleDtw.py
+    
+//    DeltaP[0, :] = 2  # (0,-1)
+//    DeltaP[:, 0] = 1  # (-1,0)
+//    DeltaP[0, 0] = 0  # (-1,-1)
+    
+
+    
+    for(int r = 1; r < mNumRows; r++)
     {
-        for(int c = 0; c < mNumCols; c++){
-            //fill the ppiDirectMatrix[r][c] = ?
+        for(int c = 1; c < mNumCols; c++){
+
+//            int myints[] = {ppfDistanceMatrix[r - 1][c - 1], ppfDistanceMatrix[r -1][c], ppfDistanceMatrix[r][c - 1]};
+//
+//            std::vector<int> inVec {ppfDistanceMatrix[r - 1][c - 1], ppfDistanceMatrix[r -1][c], ppfDistanceMatrix[r][c - 1]};
+//
+//            ppiDirectMatrix[r][c] = *std::min_element(myints, myints+3);
+            
+            //std::min_element only works above C++17
+            //https://en.cppreference.com/w/cpp/algorithm/min_element
+//
+            
+
+            
+            
+            
+            
+            
+            
         }
     }
 
