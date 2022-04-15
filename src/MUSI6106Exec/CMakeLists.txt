@@ -5,6 +5,7 @@ set (CombFilterLIB CombFilter)
 set (FftLIB Fft)
 set (VibratoLIB Vibrato)
 set (DtwLIB Dtw)
+set (PortAudioLIB PortAudio)
 
 ## get all source files (note: this is considered bad style, one could also add file names individually)
 file(GLOB ${APP}_SOURCES RELATIVE ${CMAKE_SOURCE_DIR}/src/${APP} *.c;*.cpp;*.txt)
