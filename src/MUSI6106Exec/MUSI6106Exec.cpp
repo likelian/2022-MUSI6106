@@ -6,12 +6,74 @@
 
 #include "AudioFileIf.h"
 #include "Vibrato.h"
+#include "portaudio.h"
 
 using std::cout;
 using std::endl;
 
 // local function declarations
 void    showClInfo();
+
+typedef struct paTestData
+{
+    float left_phase;
+    float right_phase;
+    CAudioFileIf* phAudioFile = 0;
+    CAudioFileIf* phAudioOutputFile = 0;
+    CVibrato* pCVibrato = 0;
+    float** ppfInputAudio = 0;
+    float** ppfOutputAudio = 0;
+    long long iNumFrames;
+    int iNumChannels;
+}
+paTestData;
+
+// This routine will be called by the PortAudio engine when audio is needed.
+static int patestCallback ( const void *inputBuffer, void *outputBuffer,
+                           unsigned long framesPerBuffer,
+                           const PaStreamCallbackTimeInfo* timeInfo,
+                           PaStreamCallbackFlags statusFlags,
+                           void *userData )
+{
+    paTestData *data = (paTestData*)userData;
+    float *out = (float*)outputBuffer;
+    
+    (void) inputBuffer;
+    (void) statusFlags;
+    (void) timeInfo;
+
+    // processing
+    if (!data->phAudioFile->isEof())
+    {
+        data->phAudioFile->readData(data->ppfInputAudio, data->iNumFrames);
+        data->pCVibrato->process(data->ppfInputAudio, data->ppfOutputAudio, data->iNumFrames);
+
+        // fill in PortAudio output with Vibrato output.
+        for (int i = 0; i < data->iNumFrames; i++) {
+            for (int c = 0; c < data->iNumChannels; c++) {
+                *out++ = data->ppfOutputAudio[c][i];
+            }
+        }
+        
+        // fill in remainder of frames for empty audio output.
+        for (int i = data->iNumFrames; i < framesPerBuffer; i++) {
+            for (int c = 0; c < data->iNumChannels; c++) {
+                *out++ = 0.f;
+            }
+        }
+        
+        data->phAudioOutputFile->writeData(data->ppfOutputAudio, data->iNumFrames);
+    } else {
+        // fill PortAudio output with empty audio output (end of file).
+        for (int i = 0; i < framesPerBuffer; i++) {
+            for (int c = 0; c < data->iNumChannels; c++) {
+                *out++ = 0.f;
+            }
+        }
+    }
+
+    return 0;
+}
 
 /////////////////////////////////////////////////////////////////////////////////
 // main function
@@ -22,106 +84,146 @@ int main(int argc, char* argv[])
         sOutputFilePath;
 
     static const int            kBlockSize = 1024;
-    long long                   iNumFrames = kBlockSize;
-    int                         iNumChannels;
 
     float                       fModFrequencyInHz;
     float                       fModWidthInSec;
 
     clock_t                     time = 0;
 
-    float** ppfInputAudio = 0;
-    float** ppfOutputAudio = 0;
-
-    CAudioFileIf* phAudioFile = 0;
-    CAudioFileIf* phAudioOutputFile = 0;
-
     CAudioFileIf::FileSpec_t    stFileSpec;
 
-    CVibrato* pCVibrato = 0;
-
     showClInfo();
-
+    
+    PaStream *stream;
+    PaStreamParameters outputParameters;
+    PaError err;
+    paTestData data;
 
     // command line args
     if (argc < 5)
     {
-        cout << "Incorrect number of arguments!" << endl;
-        return -1;
+        fModWidthInSec = 0.f;
+        if (argc < 4) {
+            fModFrequencyInHz = 0.f;
+        }
+        if (argc < 3) {
+            sOutputFilePath = "output.wav";
+        }
+        if (argc < 2) {
+            sInputFilePath = "input.wav";
+        }
+    } else {
+        sInputFilePath = argv[1];
+        sOutputFilePath = argv[2];
+        fModFrequencyInHz = atof(argv[3]);
+        fModWidthInSec = atof(argv[4]);
     }
-    sInputFilePath = argv[1];
-    sOutputFilePath = argv[2];
-    fModFrequencyInHz = atof(argv[3]);
-    fModWidthInSec = atof(argv[4]);
 
     ///////////////////////////////////////////////////////////////////////////
-    CAudioFileIf::create(phAudioFile);
-    CAudioFileIf::create(phAudioOutputFile);
+    
+    CAudioFileIf::create(data.phAudioFile);
+    CAudioFileIf::create(data.phAudioOutputFile);
 
-    phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
-    phAudioFile->getFileSpec(stFileSpec);
-    phAudioOutputFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
-    iNumChannels = stFileSpec.iNumChannels;
-    if (!phAudioFile->isOpen())
+    data.phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
+    data.phAudioFile->getFileSpec(stFileSpec);
+    data.phAudioOutputFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
+    data.iNumChannels = stFileSpec.iNumChannels;
+    if (!data.phAudioFile->isOpen())
     {
         cout << "Input file open error!";
 
-        CAudioFileIf::destroy(phAudioFile);
-        CAudioFileIf::destroy(phAudioOutputFile);
+        CAudioFileIf::destroy(data.phAudioFile);
+        CAudioFileIf::destroy(data.phAudioOutputFile);
         return -1;
     }
-    else if (!phAudioOutputFile->isOpen())
+    else if (!data.phAudioOutputFile->isOpen())
     {
         cout << "Output file cannot be initialized!";
 
-        CAudioFileIf::destroy(phAudioFile);
-        CAudioFileIf::destroy(phAudioOutputFile);
+        CAudioFileIf::destroy(data.phAudioFile);
+        CAudioFileIf::destroy(data.phAudioOutputFile);
         return -1;
     }
+    
+    data.iNumFrames = kBlockSize;
+    
     ////////////////////////////////////////////////////////////////////////////
-    CVibrato::create(pCVibrato);
-    pCVibrato->init(fModWidthInSec, stFileSpec.fSampleRateInHz, iNumChannels);
+    CVibrato::create(data.pCVibrato);
+    data.pCVibrato->init(fModWidthInSec, stFileSpec.fSampleRateInHz, data.iNumChannels);
 
     // allocate memory
-    ppfInputAudio = new float* [stFileSpec.iNumChannels];
+    data.ppfInputAudio = new float* [stFileSpec.iNumChannels];
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
-        ppfInputAudio[i] = new float[kBlockSize];
+        data.ppfInputAudio[i] = new float[kBlockSize];
 
-    ppfOutputAudio = new float* [stFileSpec.iNumChannels];
+    data.ppfOutputAudio = new float* [stFileSpec.iNumChannels];
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
-        ppfOutputAudio[i] = new float[kBlockSize];
+        data.ppfOutputAudio[i] = new float[kBlockSize];
 
     // Set parameters of vibrato
-    pCVibrato->setParam(CVibrato::kParamModFreqInHz, fModFrequencyInHz);
-    pCVibrato->setParam(CVibrato::kParamModWidthInS, fModWidthInSec);
-
-    // processing
-    while (!phAudioFile->isEof())
-    {
-        phAudioFile->readData(ppfInputAudio, iNumFrames);
-        pCVibrato->process(ppfInputAudio, ppfOutputAudio, iNumFrames);
-        phAudioOutputFile->writeData(ppfOutputAudio, iNumFrames);
+    data.pCVibrato->setParam(CVibrato::kParamModFreqInHz, fModFrequencyInHz);
+    data.pCVibrato->setParam(CVibrato::kParamModWidthInS, fModWidthInSec);
+    
+    ////////////////////////////////////////////////////////////////////////////
+    
+    // initialize PortAudio
+    err = Pa_Initialize();
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
     }
-    phAudioFile->getFileSpec(stFileSpec);
 
+    // setup audio output
+    outputParameters.device = Pa_GetDefaultOutputDevice(); /* default output device */
+    outputParameters.channelCount = stFileSpec.iNumChannels;
+    outputParameters.sampleFormat = paFloat32;
+    outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = NULL;
+    
+    // setup stream
+    err = Pa_OpenStream(&stream, NULL, &outputParameters, stFileSpec.fSampleRateInHz, kBlockSize, paClipOff, patestCallback, &data);
 
-    cout << "\nreading/writing done in: \t" << (clock() - time) * 1.F / CLOCKS_PER_SEC << " seconds." << endl;
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+    }
+
+    err = Pa_StartStream( stream );
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+    }
+    
+    /* Sleep for several seconds. */
+    Pa_Sleep(5*1000);
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
-    CAudioFileIf::destroy(phAudioFile);
-    CAudioFileIf::destroy(phAudioOutputFile);
-    CVibrato::destroy(pCVibrato);
+    CAudioFileIf::destroy(data.phAudioFile);
+    CAudioFileIf::destroy(data.phAudioOutputFile);
+    CVibrato::destroy(data.pCVibrato);
 
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
     {
-        delete[] ppfInputAudio[i];
-        delete[] ppfOutputAudio[i];
+        delete[] data.ppfInputAudio[i];
+        delete[] data.ppfOutputAudio[i];
     }
-    delete[] ppfInputAudio;
-    delete[] ppfOutputAudio;
-    ppfInputAudio = 0;
-    ppfOutputAudio = 0;
+    delete[] data.ppfInputAudio;
+    delete[] data.ppfOutputAudio;
+    data.ppfInputAudio = 0;
+    data.ppfOutputAudio = 0;
+    
+    err = Pa_StopStream( stream );
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+    }
+    
+    err = Pa_CloseStream( stream );
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+    }
+    
+    err = Pa_Terminate();
+    if( err != paNoError ) {
+        printf(  "PortAudio error: %s\n", Pa_GetErrorText( err ) );
+    }
 
     // all done
     return 0;
