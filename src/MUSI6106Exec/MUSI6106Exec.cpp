@@ -103,14 +103,15 @@ int main(int argc, char* argv[])
     // command line args
     if (argc < 4)
     {
-        fModWidthInSec = 0.f;
+        fModWidthInSec = 1.f;
         if (argc < 3) 
         {
-            fModFrequencyInHz = 0.f;
+            fModFrequencyInHz = 2.f;
         }
         if (argc < 2) 
         {
-            sInputFilePath = "input.wav";
+            //sInputFilePath = "input.wav";
+            sInputFilePath = "/Users/likelian/Desktop/Audio_software/audio/untitled-001.wav";
         }
     } 
     else 
