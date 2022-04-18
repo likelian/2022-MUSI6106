@@ -16,17 +16,13 @@ void    showClInfo();
 
 typedef struct paTestData
 {
-    float left_phase;
-    float right_phase;
     CAudioFileIf* phAudioFile = 0;
-    CAudioFileIf* phAudioOutputFile = 0;
     CVibrato* pCVibrato = 0;
     float** ppfInputAudio = 0;
     float** ppfOutputAudio = 0;
     long long iNumFrames;
     int iNumChannels;
-}
-paTestData;
+} paTestData;
 
 // This routine will be called by the PortAudio engine when audio is needed.
 static int patestCallback ( const void *inputBuffer, void *outputBuffer,
@@ -54,15 +50,13 @@ static int patestCallback ( const void *inputBuffer, void *outputBuffer,
                 *out++ = data->ppfOutputAudio[c][i];
             }
         }
-        
+
         // fill in remainder of frames for empty audio output.
         for (int i = data->iNumFrames; i < framesPerBuffer; i++) {
             for (int c = 0; c < data->iNumChannels; c++) {
                 *out++ = 0.f;
             }
         }
-        
-        data->phAudioOutputFile->writeData(data->ppfOutputAudio, data->iNumFrames);
     } else {
         // fill PortAudio output with empty audio output (end of file).
         for (int i = 0; i < framesPerBuffer; i++) {
@@ -103,45 +97,31 @@ int main(int argc, char* argv[])
     if (argc < 5)
     {
         fModWidthInSec = 0.f;
-        if (argc < 4) {
-            fModFrequencyInHz = 0.f;
-        }
         if (argc < 3) {
-            sOutputFilePath = "output.wav";
+            fModFrequencyInHz = 0.f;
         }
         if (argc < 2) {
             sInputFilePath = "input.wav";
         }
     } else {
         sInputFilePath = argv[1];
-        sOutputFilePath = argv[2];
-        fModFrequencyInHz = atof(argv[3]);
-        fModWidthInSec = atof(argv[4]);
+        fModFrequencyInHz = atof(argv[2]);
+        fModWidthInSec = atof(argv[3]);
     }
 
     ///////////////////////////////////////////////////////////////////////////
     
     CAudioFileIf::create(data.phAudioFile);
-    CAudioFileIf::create(data.phAudioOutputFile);
 
     data.phAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead);
     data.phAudioFile->getFileSpec(stFileSpec);
-    data.phAudioOutputFile->openFile(sOutputFilePath, CAudioFileIf::kFileWrite, &stFileSpec);
     data.iNumChannels = stFileSpec.iNumChannels;
+    
     if (!data.phAudioFile->isOpen())
     {
         cout << "Input file open error!";
 
         CAudioFileIf::destroy(data.phAudioFile);
-        CAudioFileIf::destroy(data.phAudioOutputFile);
-        return -1;
-    }
-    else if (!data.phAudioOutputFile->isOpen())
-    {
-        cout << "Output file cannot be initialized!";
-
-        CAudioFileIf::destroy(data.phAudioFile);
-        CAudioFileIf::destroy(data.phAudioOutputFile);
         return -1;
     }
     
@@ -197,7 +177,6 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // clean-up
     CAudioFileIf::destroy(data.phAudioFile);
-    CAudioFileIf::destroy(data.phAudioOutputFile);
     CVibrato::destroy(data.pCVibrato);
 
     for (int i = 0; i < stFileSpec.iNumChannels; i++)
