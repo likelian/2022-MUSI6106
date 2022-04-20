@@ -1,12 +1,14 @@
 
 #include <iostream>
 #include <ctime>
+#include <thread>
 
 #include "MUSI6106Config.h"
 
 #include "AudioFileIf.h"
 #include "Vibrato.h"
 #include "portaudio.h"
+
 
 using std::cout;
 using std::endl;
@@ -42,11 +44,13 @@ static int patestCallback ( const void *inputBuffer,
     // processing
     if (!data->phAudioFile->isEof())
     {
-        data->phAudioFile->readData(data->ppfInputAudio, data->iNumFrames);
 
+        //data->phAudioFile->readData(data->ppfInputAudio, data->iNumFrames);
+        
+    
         data->pCVibrato->process(data->ppfInputAudio, data->ppfOutputAudio, data->iNumFrames);
 
-        // fill in PortAudio output with Vibrato output.
+        // fill in PortAudio outp   ut with Vibrato output.
         for (int i = 0; i < data->iNumFrames; i++) 
         {
             for (int c = 0; c < data->iNumChannels; c++) 
@@ -171,6 +175,11 @@ int main(int argc, char* argv[])
     stStreamParameters.sampleFormat = paFloat32;
     stStreamParameters.suggestedLatency = Pa_GetDeviceInfo( stStreamParameters.device )->defaultLowOutputLatency;
     stStreamParameters.hostApiSpecificStreamInfo = NULL;
+    
+    
+    for (int i = 0; i < stUserData.iNumFrames; i++)
+        stUserData.phAudioFile->readData(stUserData.ppfInputAudio, stUserData.iNumFrames);
+    
     
     // setup stream
     err = Pa_OpenStream(&pPaStream, 
